@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/header') %>
+    <% if (typeof customCSS !== 'undefined') { %>
+        <link rel="stylesheet" href="<%= customCSS %>">
+    <% } %>
+</head>
+<body class="bg-gray-100">
+    <div class="page-container">
+        <header class="navbar">
+            <%- include('partials/navbar') %>
+        </header>
+        <div class="content-wrapper">
+            <%- include('partials/sidebar') %>
+
+            <main class="main-content flex-1 p-4 md:ml-64">
+                <%- body %>
+            </main>
+        </div>
+        <footer class="footer">
+            <%- include('partials/footer') %>
+        </footer>
+    </div>
+
+    <% if (typeof customJS !== 'undefined') { %>
+        <script src="<%= customJS %>"></script>
+    <% } %>
+</body>
+</html>
