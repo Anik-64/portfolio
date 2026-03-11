@@ -1,0 +1,57 @@
+<footer class="bg-white shadow-inner p-4 text-center text-gray-600 print:hidden w-full">
+    <p class="text-sm">
+        &copy; <%= new Date().getFullYear() %> <%= appName %>. All rights reserved.  
+        <span class="block sm:inline text-gray-500">Powered by <span class="font-semibold text-gray-700">AGAMiLabs Ltd.</span></span>
+    </p>
+</footer>
+
+<script>
+    document.getElementById('sidebarOpenBtn')?.addEventListener('click', () => {
+        document.getElementById('app-sidebar')?.classList.remove('-translate-x-full');
+    });
+    document.getElementById('sidebarCloseBtn')?.addEventListener('click', () => {
+        document.getElementById('app-sidebar')?.classList.add('-translate-x-full');
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropdownToggle = document.getElementById('userDropdownToggle');
+        const dropdownMenu = document.getElementById('userDropdownMenu');
+        
+        if (dropdownToggle && dropdownMenu) {
+            dropdownToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('hidden');
+            });
+        }
+
+        // Mobile menu toggle
+        const mobileToggle = document.getElementById('mobileMenuToggle');
+        const mobileMenu = document.getElementById('mobileDropdownMenu');
+        
+        if (mobileToggle && mobileMenu) {
+            mobileToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+
+        // Close menus when clicking outside
+        document.addEventListener('click', function() {
+            if (dropdownMenu) dropdownMenu.classList.add('hidden');
+            if (mobileMenu) mobileMenu.classList.add('hidden');
+        });
+
+        // Change password buttons
+        const changePasswordBtns = [
+            document.getElementById('change_password_button'),
+            document.getElementById('mobile_change_password')
+        ].filter(Boolean);
+        
+        changePasswordBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (dropdownMenu) dropdownMenu.classList.add('hidden');
+                if (mobileMenu) mobileMenu.classList.add('hidden');
+            });
+        });
+    });
+</script>
