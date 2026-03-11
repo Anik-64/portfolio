@@ -157,10 +157,10 @@ registrationRouter.post('/',
             
             const peopleResult = await pool.query(`
                     INSERT INTO gen_peopleprimary 
-                        (peopleid, firstname, lastname, gendersetno) 
-                    VALUES ($1, $2, $3, $4)
+                        (peopleid, firstname, lastname) 
+                    VALUES ($1, $2, $3)
                     RETURNING peopleno;
-                `, [contact, firstname, lastname, 4] // 4 = Not mentioned
+                `, [contact, firstname, lastname]
             );
             const peopleno = peopleResult.rows[0].peopleno;
 
@@ -173,17 +173,10 @@ registrationRouter.post('/',
 
             const userResult = await pool.query(`
                     INSERT INTO gen_users 
-                        (peopleno, username, firebase_uid, primaryuserroleno) 
-                    VALUES ($1, $2, $3, $4)
-                    RETURNING userno;
-                `, [peopleno, username, firebase_uid, 3]
+                        (peopleno, username, firebase_uid) 
+                    VALUES ($1, $2, $3)
+                `, [peopleno, username, firebase_uid]
             );
-            const userno = userResult.rows[0].userno;
-
-            await pool.query(`
-                INSERT INTO gen_userroles (userno, userroleno)
-                VALUES ($1, 3)
-            `, [userno]);
 
             await pool.query("COMMIT");
 
