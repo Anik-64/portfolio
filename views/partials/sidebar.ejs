@@ -1,0 +1,203 @@
+<% function isActive(path) { return currentPath===path ? 'bg-blue-500 text-white'
+    : 'text-gray-700 hover:bg-blue-500 hover:text-white' ; } %>
+
+    <div class="w-64 bg-white shadow-md fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-40 md:z-auto print:hidden h-screen"
+        id="app-sidebar">
+        <!-- Header / Logo -->
+        <div class="flex items-center p-2 border-b border-gray-200">
+            <div class="flex-shrink-0 w-16 h-16 flex items-center justify-center">
+                <img class="w-10 h-10 rounded-full object-cover" src="/images/logo.jpg" alt="Logo">
+            </div>
+            <div class="ml-2 overflow-hidden">
+                <div class="text-gray-600 whitespace-nowrap">
+                    <span class="font-medium">Welcome</span>
+                    <span class="font-semibold text-blue-600 ml-1">
+                        <%= user.fullname.split(' ')[0] %>!</span>
+            </div>
+        </div>
+        <button type="button" id="sidebarCloseBtn" class="hamburger md:hidden ml-auto">
+            <span class="hamburger-box">
+                <span class="hamburger-inner w-6 h-0.5 bg-gray-600 block"></span>
+                <span class="hamburger-inner w-6 h-0.5 bg-gray-600 block mt-1.5"></span>
+                <span class="hamburger-inner w-6 h-0.5 bg-gray-600 block mt-1.5"></span>
+            </span>
+        </button>
+    </div>
+
+    <div class="overflow-y-auto h-screen scrollbar-sidebar pb-40">
+        <div class="p-4">
+            <ul class="mt-3 space-y-2 vertical-nav-menu">
+                <li>
+                    <a href="/profile" class="flex items-center px-4 py-2 rounded text-sm <%= isActive('profile')%>">
+                        <i class="fas fa-user mr-2 w-5 text-center flex-shrink-0"></i> Profile
+                    </a>
+                </li>
+                <li>
+                    <button id="toggle-books-menu"
+                        class="flex items-center justify-between w-full px-4 py-2 text-left rounded hover:bg-gray-100 focus:outline-none">
+                        <span class="flex items-center text-gray-700 font-semibold text-sm">
+                            <i class="fas fa-book-open mr-2 w-5 text-center flex-shrink-0"></i> Settings
+                        </span>
+                        <i id="books-menu-icon"
+                            class="fas fa-chevron-down transition-transform duration-200"></i>
+                    </button>
+
+                    <div id="books-menu-submenu" class="mt-2 ml-4 hidden">
+                        <ul class="space-y-1 pr-2">
+                            <li>
+                                <a href="/bookgenres"
+                                    class="flex items-center px-4 py-2 rounded text-sm <%= isActive('bookgenres') %>">
+                                    <i class="fas fa-tags mr-2 w-5 text-center flex-shrink-0"></i> Genres
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/books"
+                                    class="flex items-center px-4 py-2 rounded text-sm <%= isActive('books') %>">
+                                    <i class="fas fa-book mr-2 w-5 text-center flex-shrink-0"></i> Books
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/bookreports"
+                                    class="flex items-center px-4 py-2 rounded text-sm <%= isActive('bookreports') %>">
+                                    <i class="fas fa-flag mr-2 w-5 text-center flex-shrink-0"></i> Book
+                                    Reports
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/subscription"
+                                    class="flex items-center px-4 py-2 rounded text-sm <%= isActive('subscription') %>">
+                                    <i class="fas fa-file-invoice-dollar mr-2 w-5 text-center flex-shrink-0"></i>
+                                    Subscription
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/user-subscriptions"
+                                    class="flex items-center px-4 py-2 rounded text-sm <%= isActive('user-subscriptions') %>">
+                                    <i class="fas fa-users-cog mr-2 w-5 text-center flex-shrink-0"></i>
+                                    User Subscriptions
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li>
+                    <button id="toggle-demo-menu"
+                        class="flex items-center justify-between w-full px-4 py-2 text-left rounded hover:bg-gray-100 focus:outline-none">
+                        <span class="flex items-center text-gray-700 font-semibold text-sm">
+                            <i class="fas fa-book mr-2 w-5 text-center flex-shrink-0"></i> System
+                            Configuration
+                        </span>
+                        <i id="demo-menu-icon"
+                            class="fas fa-chevron-down transition-transform duration-200"></i>
+                    </button>
+
+                    <div id="demo-menu-submenu" class="mt-2 ml-4 hidden">
+                        <ul class="space-y-1 pr-2">
+                            <li>
+                                <a href="/users"
+                                    class="flex items-center px-4 py-2 rounded text-sm <%= isActive('users') %>">
+                                    <i class="fas fa-users mr-2 w-5 text-center flex-shrink-0"></i> User
+                                    Management
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/genderset"
+                                    class="flex items-center px-4 py-2 rounded text-sm <%= isActive('genderset') %>">
+                                    <i class="fas fa-venus-mars mr-2 w-5 text-center flex-shrink-0"></i>
+                                    Genders
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/contacttype"
+                                    class="flex items-center px-4 py-2 rounded text-sm <%= isActive('contacttype') %>">
+                                    <i class="fas fa-id-card mr-2 w-5 text-center flex-shrink-0"></i>
+                                    Contact Type
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/loginattempts"
+                                    class="flex items-center px-4 py-2 rounded text-sm <%= isActive('loginattempts') %>">
+                                    <i class="fas fa-key mr-2 w-5 text-center flex-shrink-0"></i> Login
+                                    Attempts
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li>
+                    <button id="toggle-packs-menu"
+                        class="flex items-center justify-between w-full px-4 py-2 text-left rounded hover:bg-gray-100 focus:outline-none">
+                        <span class="flex items-center text-gray-700 font-semibold text-sm">
+                            <i class="fas fa-book mr-2 w-5 text-center flex-shrink-0"></i> Packs
+                        </span>
+                        <i id="packs-menu-icon"
+                            class="fas fa-chevron-down transition-transform duration-200"></i>
+                    </button>
+
+                    <div id="packs-menu-submenu" class="mt-2 ml-4 hidden">
+                        <ul class="space-y-1 pr-2">
+                            <li>
+                                <a href="/creditpacks"
+                                    class="flex items-center px-4 py-2 rounded text-sm <%= isActive('creditpacks') %>">
+                                    <i class="fas fa-users mr-2 w-5 text-center flex-shrink-0"></i> Credit
+                                    Packs
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                document.querySelectorAll('[id^="toggle-"]').forEach(toggleBtn => {
+                    toggleBtn.addEventListener('click', function () {
+                        const clickedKey = this.id.replace('toggle-', '');
+                        const clickedSub = document.getElementById(`${clickedKey}-submenu`);
+                        const clickedIcon = document.getElementById(`${clickedKey}-icon`);
+                        const isHidden = clickedSub.classList.contains('hidden');
+
+                        // Collapse others
+                        document.querySelectorAll('[id$="-submenu"]').forEach(sub => {
+                            const key = sub.id.replace('-submenu', '');
+                            if (key !== clickedKey) {
+                                sub.classList.add('hidden');
+                                const icon = document.getElementById(`${key}-icon`);
+                                if (icon) icon.classList.remove('rotate-180');
+                                localStorage.setItem(`menuExpanded_${key}`, 'false');
+                            }
+                        });
+
+                        // Toggle clicked
+                        if (isHidden) {
+                            clickedSub.classList.remove('hidden');
+                            clickedIcon.classList.add('rotate-180');
+                            localStorage.setItem(`menuExpanded_${clickedKey}`, 'true');
+                        } else {
+                            clickedSub.classList.add('hidden');
+                            clickedIcon.classList.remove('rotate-180');
+                            localStorage.setItem(`menuExpanded_${clickedKey}`, 'false');
+                        }
+                    });
+                });
+
+                // Restore expanded state from localStorage
+                document.querySelectorAll('[id$="-submenu"]').forEach(submenu => {
+                    const key = submenu.id.replace('-submenu', '');
+                    if (localStorage.getItem(`menuExpanded_${key}`) === 'true') {
+                        submenu.classList.remove('hidden');
+                        const icon = document.getElementById(`${key}-icon`);
+                        if (icon) icon.classList.add('rotate-180');
+                    }
+                });
+
+                // Scroll to active link
+                const active = document.querySelector('a.bg-blue-500');
+                if (active) {
+                    setTimeout(() => active.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+                }
+            });
+        </script>
