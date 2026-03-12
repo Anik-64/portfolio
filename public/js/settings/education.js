@@ -1,0 +1,342 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const dataTable = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+    const addBtn = document.getElementById('addBtn');
+    const dataModal = document.getElementById('dataModal');
+    const deleteModal = document.getElementById('deleteModal');
+    const closeModal = document.getElementById('closeModal');
+    const closeDeleteModal = document.getElementById('closeDeleteModal');
+    const cancelDelete = document.getElementById('cancelDelete');
+    const confirmDelete = document.getElementById('confirmDelete');
+    const dataForm = document.getElementById('dataForm');
+    const modalTitle = document.getElementById('modalTitle');
+    const floatingMessage = document.getElementById('floatingMessage');
+    const searchInput = document.getElementById('searchInput');
+
+    let originalData = [];
+    let currentId = null;
+
+    if (!localStorage.getItem('accessToken')) {
+        window.location.href = '/login';
+    }
+
+    loadData();
+
+    addBtn.addEventListener('click', () => {
+        currentId = null;
+        modalTitle.textContent = 'Add Education';
+        dataForm.reset();
+        document.getElementById('is_visible').checked = true;
+        document.getElementById('is_current').checked = false;
+        document.getElementById('display_order').value = 0;
+        dataModal.classList.remove('hidden');
+    });
+
+    closeModal.addEventListener('click', () => dataModal.classList.add('hidden'));
+    closeDeleteModal.addEventListener('click', () => deleteModal.classList.add('hidden'));
+    cancelDelete.addEventListener('click', () => deleteModal.classList.add('hidden'));
+
+    searchInput.addEventListener('input', debounce(() => {
+        const query = searchInput.value.trim().toLowerCase();
+        if (query) {
+            const filtered = originalData.filter(item => 
+                (item.institution || '').toLowerCase().includes(query) || 
+                (item.degree || '').toLowerCase().includes(query)
+            );
+            renderData(filtered);
+        } else {
+            renderData(originalData);
+        }
+    }, 500));
+
+    // Handle is_current checkbox to toggle end_date
+    document.getElementById('is_current').addEventListener('change', function() {
+        const endDateInput = document.getElementById('end_date');
+        if (this.checked) {
+            endDateInput.value = '';
+            endDateInput.disabled = true;
+            endDateInput.classList.add('bg-gray-100');
+        } else {
+            endDateInput.disabled = false;
+            endDateInput.classList.remove('bg-gray-100');
+        }
+    });
+
+    dataForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = {
+            institution: document.getElementById('institution').value.trim(),
+            degree: document.getElementById('degree').value.trim(),
+            field_of_study: document.getElementById('field_of_study').value.trim(),
+            location: document.getElementById('location').value.trim() || null,
+            start_date: document.getElementById('start_date').value || null,
+            end_date: document.getElementById('end_date').value || null,
+            is_current: document.getElementById('is_current').checked,
+            grade: document.getElementById('grade').value.trim() || null,
+            activities: document.getElementById('activities').value.trim() || null,
+            description: document.getElementById('description').value.trim() || null,
+            display_order: parseInt(document.getElementById('display_order').value) || 0,
+            is_visible: document.getElementById('is_visible').checked
+        };
+
+        if (formData.is_current) {
+            formData.end_date = null;
+        }
+
+        if (!formData.institution || !formData.degree || !formData.field_of_study) {
+            showMessage('Institution, Degree, and Field of Study are required', 'error');
+            return;
+        }
+
+        if (currentId) {
+            updateData(currentId, formData);
+        } else {
+            createData(formData);
+        }
+    });
+
+    confirmDelete.addEventListener('click', function() {
+        if (currentId) deleteData(currentId);
+    });
+
+    async function fetchWithToken(url, options = {}) {
+        const accessToken = localStorage.getItem('accessToken');
+        options.headers = {
+            ...options.headers,
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+        };
+
+        try {
+            const response = await fetch(url, options);
+            if (response.status === 401) {
+                const refreshed = await refreshAccessToken();
+                if (refreshed) {
+                    options.headers.Authorization = `Bearer ${localStorage.getItem('accessToken')}`;
+                    return await fetch(url, options);
+                } else {
+                    window.location.href = '/login';
+                    return null;
+                }
+            }
+            return response;
+        } catch (err) {
+            console.error('Fetch error:', err);
+            showMessage('An error occurred. Please try again.', 'error');
+            return null;
+        }
+    }
+
+    async function refreshAccessToken() {
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (!refreshToken) return false;
+
+        try {
+            const response = await fetch('/api/v1/refresh-token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refreshToken })
+            });
+            const data = await response.json();
+            if (data.error) {
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                return false;
+            }
+            localStorage.setItem('accessToken', data.token);
+            localStorage.setItem('refreshToken', data.refreshToken);
+            return true;
+        } catch (err) {
+            console.error('Refresh token error:', err);
+            return false;
+        }
+    }
+
+    async function loadData() {
+        const response = await fetchWithToken('/api/v1/settings/education');
+        if (!response) return;
+
+        if(response.status === 404) {
+             renderData([]);
+             return;
+        }
+
+        const data = await response.json();
+        if (data.error) {
+            showMessage(data.message, 'error');
+            renderData([]);
+            return;
+        }
+        originalData = data.data;
+        renderData(data.data);
+    }
+
+    function renderData(items) {
+        dataTable.innerHTML = '';
+        if (!items || items.length === 0) {
+            const row = dataTable.insertRow();
+            const cell = row.insertCell(0);
+            cell.colSpan = 6;
+            cell.textContent = 'No education entries found';
+            cell.className = 'text-center py-4 text-black';
+            return;
+        }
+
+        items.forEach((item, index) => {
+            const row = dataTable.insertRow();
+
+            const idCell = row.insertCell(0);
+            idCell.textContent = index + 1;
+            idCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-black';
+            
+            const instCell = row.insertCell(1);
+            instCell.textContent = item.institution;
+            instCell.className = 'px-4 py-2 whitespace-nowrap text-sm font-medium text-black';
+            
+            const degCell = row.insertCell(2);
+            degCell.textContent = `${item.degree} in ${item.field_of_study}`;
+            degCell.className = 'px-4 py-2 whitespace-normal text-sm text-gray-600';
+
+            const datesCell = row.insertCell(3);
+            const start = item.start_date ? new Date(item.start_date).toLocaleDateString() : 'N/A';
+            const end = item.is_current ? 'Present' : (item.end_date ? new Date(item.end_date).toLocaleDateString() : 'N/A');
+            datesCell.textContent = `${start} - ${end}`;
+            datesCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
+
+            const visCell = row.insertCell(4);
+            visCell.innerHTML = item.is_visible ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Yes</span>' : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">No</span>';
+            visCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
+
+            const actionsCell = row.insertCell(5);
+            actionsCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-black text-right';
+
+            const actionButtons = document.createElement('div');
+            actionButtons.className = 'flex justify-end gap-2';
+            
+            const editBtn = document.createElement('button');
+            editBtn.innerHTML = '<i class="fas fa-edit"></i>';
+            editBtn.className = 'bg-yellow-500 hover:bg-yellow-600 text-white rounded px-2 py-1';
+            editBtn.addEventListener('click', () => editDataItem(item.id));
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+            deleteBtn.className = 'bg-red-500 hover:bg-red-600 text-white rounded px-2 py-1';
+            deleteBtn.addEventListener('click', () => confirmDeleteData(item.id));
+
+            actionButtons.appendChild(editBtn);
+            actionButtons.appendChild(deleteBtn);
+            actionsCell.appendChild(actionButtons);
+        });
+    }
+
+    async function createData(postData) {
+        const response = await fetchWithToken('/api/v1/settings/education', {
+            method: 'POST',
+            body: JSON.stringify(postData)
+        });
+        if (!response) return;
+
+        const data = await response.json();
+        if (data.error) {
+            showMessage(data.message || data.error, 'error');
+            return;
+        }
+        showMessage('Successfully added', 'success');
+        dataModal.classList.add('hidden');
+        loadData();
+    }
+
+    async function editDataItem(id) {
+        const response = await fetchWithToken(`/api/v1/settings/education/${id}`);
+        if (!response) return;
+
+        const data = await response.json();
+        if (data.error) {
+            showMessage(data.message, 'error');
+            return;
+        }
+        const itemData = data.data;
+        currentId = id;
+        modalTitle.textContent = 'Edit Education';
+        
+        document.getElementById('institution').value = itemData.institution || '';
+        document.getElementById('degree').value = itemData.degree || '';
+        document.getElementById('field_of_study').value = itemData.field_of_study || '';
+        document.getElementById('location').value = itemData.location || '';
+        document.getElementById('start_date').value = itemData.start_date ? itemData.start_date.split('T')[0] : '';
+        document.getElementById('end_date').value = itemData.end_date ? itemData.end_date.split('T')[0] : '';
+        document.getElementById('is_current').checked = itemData.is_current || false;
+        document.getElementById('grade').value = itemData.grade || '';
+        document.getElementById('activities').value = itemData.activities || '';
+        document.getElementById('description').value = itemData.description || '';
+        document.getElementById('display_order').value = itemData.display_order || 0;
+        document.getElementById('is_visible').checked = itemData.is_visible;
+
+        // Trigger is_current change event to update end_date disability
+        document.getElementById('is_current').dispatchEvent(new Event('change'));
+        
+        dataModal.classList.remove('hidden');
+    }
+
+    async function updateData(id, putData) {
+        const response = await fetchWithToken(`/api/v1/settings/education/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(putData)
+        });
+        if (!response) return;
+
+        const data = await response.json();
+        if (data.error) {
+            showMessage(data.message || data.error, 'error');
+            return;
+        }
+        showMessage('Successfully updated', 'success');
+        dataModal.classList.add('hidden');
+        loadData();
+    }
+
+    function confirmDeleteData(id) {
+        currentId = id;
+        deleteModal.classList.remove('hidden');
+    }
+
+    async function deleteData(id) {
+        const response = await fetchWithToken(`/api/v1/settings/education/${id}`, {
+            method: 'DELETE'
+        });
+        if (!response) return;
+
+        const data = await response.json();
+        if (data.error) {
+            showMessage(data.message, 'error');
+            return;
+        }
+        showMessage('Successfully deleted', 'success');
+        deleteModal.classList.add('hidden');
+        loadData();
+    }
+
+    function showMessage(message, type) {
+        floatingMessage.textContent = message;
+        floatingMessage.className = `floating-message ${type} show`;
+        setTimeout(() => {
+            floatingMessage.classList.remove('show');
+            setTimeout(() => {
+                floatingMessage.textContent = '';
+                floatingMessage.className = 'floating-message';
+            }, 300);
+        }, 3000);
+    }
+
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+});
