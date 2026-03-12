@@ -206,6 +206,15 @@ app.get('/settings/audit-log', authenticateRender, (req, res) => {
     });
 });
 
+app.get('/profile', authenticateRender, (req, res) => {
+    res.render('pages/profile', { 
+        layout: 'layout', 
+        title: 'My Profile', 
+        currentPath: 'profile', 
+        customJS: '/js/profile.js' 
+    });
+});
+
 // AUTH API Gateways
 app.use('/api/v1/signup', signup);
 app.use('/api/v1/login', login);
@@ -266,6 +275,12 @@ app.use(
     '/api/v1/settings/audit-log', 
     authenticateToken, 
     routers.auditLogRouter
+);
+
+app.use(
+    '/api/v1/profile', 
+    authenticateToken, 
+    routers.profileRouter
 );
 
 app.listen(process.env.PORT || 8080, () => {
