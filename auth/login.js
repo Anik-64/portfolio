@@ -32,13 +32,10 @@ loginRouter.post('/',
 
         console.log(`Login attempt from IP: ${ipaddress}`);
 
-        const attemptno = await insertLoginAttempt('FIREBASE_AUTH', ipaddress, req.get('User-Agent'));
-
         try {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
                 const errorMessages = errors.array().map(err => err.msg);
-                await markLoginFailure(attemptno, errorMessages[0]);
                 return res.status(400).json({
                     error: true,
                     message: errorMessages[0]
@@ -50,23 +47,16 @@ loginRouter.post('/',
             const email = decodedToken.email;
             let userResult = await pool.query(`
                 SELECT 
-                    u.userno, u.peopleno, u.userstatusno, u.primaryuserroleno, u.primaryuserroletitle, u.username,
-                    us.userstatustitle,
-                    pp.dob, pp.profilepicurl,
+                    u.userno, u.peopleno, u.username,
+                    pp.profilepicurl,
                     COALESCE(pp.firstname, '') || ' ' || COALESCE(pp.lastname, '') AS fullname
                 FROM 
                     (
                         SELECT 
-                            userno, username, peopleno, userstatusno, primaryuserroleno,
-                            (SELECT userroletitle from gen_userrolesetting WHERE userroleno=u.primaryuserroleno) as primaryuserroletitle
+                            userno, username, peopleno
                         FROM gen_users as u
                         WHERE firebase_uid = $1
                     ) AS u
-                    INNER JOIN 
-                    (
-                        SELECT userstatusno, userstatustitle FROM gen_userstatus
-                    ) AS us
-                    ON u.userstatusno = us.userstatusno
                     INNER JOIN 
                     (
                         SELECT peopleno, profilepicurl, firstname, lastname FROM gen_peopleprimary
@@ -77,23 +67,16 @@ loginRouter.post('/',
             if (userResult.rowCount === 0 && email) {
                 userResult = await pool.query(`
                     SELECT 
-                        u.userno, u.peopleno, u.userstatusno, u.primaryuserroleno, u.username,
-                        us.userstatustitle,
+                        u.userno, u.peopleno, u.username,
                         pp.profilepicurl,
                         COALESCE(pp.firstname, '') || ' ' || COALESCE(pp.lastname, '') AS fullname
                     FROM 
                         (
                             SELECT 
-                                userno, username, peopleno, userstatusno, primaryuserroleno,
-                                (SELECT userroletitle from gen_userrolesetting WHERE userroleno=u.primaryuserroleno) as primaryuserroletitle
+                                userno, username, peopleno
                             FROM gen_users as u
                             WHERE username = $1
                         ) AS u
-                        INNER JOIN 
-                        (
-                            SELECT userstatusno, userstatustitle FROM gen_userstatus
-                        ) AS us
-                        ON u.userstatusno = us.userstatusno
                         INNER JOIN 
                         (
                             SELECT peopleno, profilepicurl, firstname, lastname FROM gen_peopleprimary
@@ -108,7 +91,6 @@ loginRouter.post('/',
 
 
             if (userResult.rowCount === 0) {
-                await markLoginFailure(attemptno, 'User not found');
                 return res.status(401).json({
                     error: true,
                     message: 'User not registered in system.'
@@ -116,26 +98,6 @@ loginRouter.post('/',
             }
 
             const user = userResult.rows[0];
-            const userno = user['userno'];
-            const username = user['username'];
-
-            // Check if the user is active
-            if (user.userstatusno !== 1) {
-                return res.status(403).json({
-                    error: true,
-                    message: `Account status: ${user.userstatustitle}`
-                });
-            }
-
-            const userRoleResult = await pool.query(`
-                SELECT userno, userroleno, validuntil
-                    FROM gen_userroles
-                    WHERE userroleno IN (
-                            SELECT userroleno
-                            FROM gen_userrolesetting
-                        ) AND userno = $1
-                `, [userno]
-            );
 
             // Get current time
             const currentTime = new Date().toISOString();
@@ -144,17 +106,12 @@ loginRouter.post('/',
                 userno: user.userno,
                 peopleno: user.peopleno,
                 fullname: user.fullname,
-                primaryuserroleno: user.primaryuserroleno,
-                primaryuserroletitle: user.primaryuserroletitle,
-                userroles: userRoleResult.rows, 
                 profilepicurl: user.profilepicurl ? user.profilepicurl : null,
                 currenttime: currentTime
             };
             console.log(payload);
 
             const { accessToken, refreshToken } = generateTokens(payload);
-
-            await markLoginSuccess(attemptno, userno, 'Login successful');
 
             res.cookie('refreshToken', refreshToken, {
                 httpOnly: true,
@@ -176,7 +133,6 @@ loginRouter.post('/',
             });
 
         } catch (err) {
-            await markLoginFailure(attemptno, err.message || 'Firebase Error');
             console.error(err);
 
             if (err.code && err.code.startsWith('auth/')) {
