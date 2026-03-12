@@ -52,7 +52,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = {
             name: document.getElementById('name').value.trim(),
             category: document.getElementById('category').value.trim() || null,
-            proficiency: document.getElementById('proficiency').value.trim() || null,
             icon_code: document.getElementById('icon_code').value.trim() || null,
             display_order: parseInt(document.getElementById('display_order').value) || 0,
             is_visible: document.getElementById('is_visible').checked
@@ -175,10 +174,10 @@ document.addEventListener('DOMContentLoaded', function() {
             catCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
             catCell.setAttribute('data-label', 'Category');
 
-            const profCell = row.insertCell(3);
-            profCell.textContent = item.proficiency || '-';
-            profCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
-            profCell.setAttribute('data-label', 'Proficiency');
+            const displayorderCell = row.insertCell(3);
+            displayorderCell.textContent = item.display_order || '-';
+            displayorderCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
+            displayorderCell.setAttribute('data-label', 'displayorder');
 
             const visCell = row.insertCell(4);
             visCell.innerHTML = item.is_visible ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Yes</span>' : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">No</span>';
@@ -240,7 +239,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         document.getElementById('name').value = itemData.name || '';
         document.getElementById('category').value = itemData.category || '';
-        document.getElementById('proficiency').value = itemData.proficiency || '';
         document.getElementById('icon_code').value = itemData.icon_code || '';
         document.getElementById('display_order').value = itemData.display_order || 0;
         document.getElementById('is_visible').checked = itemData.is_visible;
