@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Ebook Admin</title>
+    <title>Login - Portfolio Admin</title>
     <link rel="icon" type="image/png" href="/images/logo.jpg">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
@@ -127,7 +127,15 @@
 
     <script>
 
-
+        const firebaseConfig = {
+            apiKey: "<%= firebaseConfig.apiKey %>",
+            authDomain: "<%= firebaseConfig.authDomain %>",
+            projectId: "<%= firebaseConfig.projectId %>",
+            storageBucket: "<%= firebaseConfig.storageBucket %>",
+            messagingSenderId: "<%= firebaseConfig.messagingSenderId %>",
+            appId: "<%= firebaseConfig.appId %>",
+            measurementId: "<%= firebaseConfig.measurementId %>"
+        };
 
         if (firebase.apps.length === 0) {
             firebase.initializeApp(firebaseConfig);
@@ -240,14 +248,14 @@
 
                     // Store tokens in localStorage
                     localStorage.setItem('accessToken', data.token);
-                    localStorage.setItem('refreshToken', data.refreshToken);
+                    localStorage.setItem('refreshToken', data.refreshToken); 
 
-                    if (data.primaryuserroleno != 1) {
-                        let redirectUrl = '/unauthorized';
-                        window.location.href = redirectUrl;
-                    } else {
-                        window.location.href = '/dashboard';
-                    }
+                    // if (data.primaryuserroleno != 1) {
+                    //     let redirectUrl = '/unauthorized';
+                    //     window.location.href = redirectUrl;
+                    // } else {
+                    window.location.href = '/settings/skills';
+                    // }
                 } catch (err) {
                     console.error(err);
                     showError('An error occurred. Please try again.');
