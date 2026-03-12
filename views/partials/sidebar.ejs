@@ -33,114 +33,65 @@
                     </a>
                 </li>
                 <li>
-                    <button id="toggle-books-menu"
+                    <button id="toggle-settings-menu"
                         class="flex items-center justify-between w-full px-4 py-2 text-left rounded hover:bg-gray-100 focus:outline-none">
                         <span class="flex items-center text-gray-700 font-semibold text-sm">
-                            <i class="fas fa-book-open mr-2 w-5 text-center flex-shrink-0"></i> Settings
+                            <i class="fas fa-cogs mr-2 w-5 text-center flex-shrink-0"></i> Portfolio Settings
                         </span>
-                        <i id="books-menu-icon"
+                        <i id="settings-menu-icon"
                             class="fas fa-chevron-down transition-transform duration-200"></i>
                     </button>
 
-                    <div id="books-menu-submenu" class="mt-2 ml-4 hidden">
+                    <div id="settings-menu-submenu" class="mt-2 ml-4 hidden">
                         <ul class="space-y-1 pr-2">
                             <li>
-                                <a href="/bookgenres"
-                                    class="flex items-center px-4 py-2 rounded text-sm <%= isActive('bookgenres') %>">
-                                    <i class="fas fa-tags mr-2 w-5 text-center flex-shrink-0"></i> Genres
+                                <a href="/settings/skills" class="flex items-center px-4 py-2 rounded text-sm <%= isActive('settings/skills') %>">
+                                    <i class="fas fa-star mr-2 w-5 text-center flex-shrink-0"></i> Skills
                                 </a>
                             </li>
                             <li>
-                                <a href="/books"
-                                    class="flex items-center px-4 py-2 rounded text-sm <%= isActive('books') %>">
-                                    <i class="fas fa-book mr-2 w-5 text-center flex-shrink-0"></i> Books
+                                <a href="/settings/experiences" class="flex items-center px-4 py-2 rounded text-sm <%= isActive('settings/experiences') %>">
+                                    <i class="fas fa-briefcase mr-2 w-5 text-center flex-shrink-0"></i> Experiences
                                 </a>
                             </li>
                             <li>
-                                <a href="/bookreports"
-                                    class="flex items-center px-4 py-2 rounded text-sm <%= isActive('bookreports') %>">
-                                    <i class="fas fa-flag mr-2 w-5 text-center flex-shrink-0"></i> Book
-                                    Reports
+                                <a href="/settings/projects" class="flex items-center px-4 py-2 rounded text-sm <%= isActive('settings/projects') %>">
+                                    <i class="fas fa-project-diagram mr-2 w-5 text-center flex-shrink-0"></i> Projects
                                 </a>
                             </li>
                             <li>
-                                <a href="/subscription"
-                                    class="flex items-center px-4 py-2 rounded text-sm <%= isActive('subscription') %>">
-                                    <i class="fas fa-file-invoice-dollar mr-2 w-5 text-center flex-shrink-0"></i>
-                                    Subscription
+                                <a href="/settings/project-images" class="flex items-center px-4 py-2 rounded text-sm <%= isActive('settings/project-images') %>">
+                                    <i class="fas fa-images mr-2 w-5 text-center flex-shrink-0"></i> Project Images
                                 </a>
                             </li>
                             <li>
-                                <a href="/user-subscriptions"
-                                    class="flex items-center px-4 py-2 rounded text-sm <%= isActive('user-subscriptions') %>">
-                                    <i class="fas fa-users-cog mr-2 w-5 text-center flex-shrink-0"></i>
-                                    User Subscriptions
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-                <li>
-                    <button id="toggle-demo-menu"
-                        class="flex items-center justify-between w-full px-4 py-2 text-left rounded hover:bg-gray-100 focus:outline-none">
-                        <span class="flex items-center text-gray-700 font-semibold text-sm">
-                            <i class="fas fa-book mr-2 w-5 text-center flex-shrink-0"></i> System
-                            Configuration
-                        </span>
-                        <i id="demo-menu-icon"
-                            class="fas fa-chevron-down transition-transform duration-200"></i>
-                    </button>
-
-                    <div id="demo-menu-submenu" class="mt-2 ml-4 hidden">
-                        <ul class="space-y-1 pr-2">
-                            <li>
-                                <a href="/users"
-                                    class="flex items-center px-4 py-2 rounded text-sm <%= isActive('users') %>">
-                                    <i class="fas fa-users mr-2 w-5 text-center flex-shrink-0"></i> User
-                                    Management
+                                <a href="/settings/certifications" class="flex items-center px-4 py-2 rounded text-sm <%= isActive('settings/certifications') %>">
+                                    <i class="fas fa-certificate mr-2 w-5 text-center flex-shrink-0"></i> Certifications
                                 </a>
                             </li>
                             <li>
-                                <a href="/genderset"
-                                    class="flex items-center px-4 py-2 rounded text-sm <%= isActive('genderset') %>">
-                                    <i class="fas fa-venus-mars mr-2 w-5 text-center flex-shrink-0"></i>
-                                    Genders
+                                <a href="/settings/publications" class="flex items-center px-4 py-2 rounded text-sm <%= isActive('settings/publications') %>">
+                                    <i class="fas fa-book mr-2 w-5 text-center flex-shrink-0"></i> Publications
                                 </a>
                             </li>
                             <li>
-                                <a href="/contacttype"
-                                    class="flex items-center px-4 py-2 rounded text-sm <%= isActive('contacttype') %>">
-                                    <i class="fas fa-id-card mr-2 w-5 text-center flex-shrink-0"></i>
-                                    Contact Type
+                                <a href="/settings/education" class="flex items-center px-4 py-2 rounded text-sm <%= isActive('settings/education') %>">
+                                    <i class="fas fa-graduation-cap mr-2 w-5 text-center flex-shrink-0"></i> Education
                                 </a>
                             </li>
                             <li>
-                                <a href="/loginattempts"
-                                    class="flex items-center px-4 py-2 rounded text-sm <%= isActive('loginattempts') %>">
-                                    <i class="fas fa-key mr-2 w-5 text-center flex-shrink-0"></i> Login
-                                    Attempts
+                                <a href="/settings/trainings" class="flex items-center px-4 py-2 rounded text-sm <%= isActive('settings/trainings') %>">
+                                    <i class="fas fa-chalkboard-teacher mr-2 w-5 text-center flex-shrink-0"></i> Trainings
                                 </a>
                             </li>
-                        </ul>
-                    </div>
-                </li>
-                <li>
-                    <button id="toggle-packs-menu"
-                        class="flex items-center justify-between w-full px-4 py-2 text-left rounded hover:bg-gray-100 focus:outline-none">
-                        <span class="flex items-center text-gray-700 font-semibold text-sm">
-                            <i class="fas fa-book mr-2 w-5 text-center flex-shrink-0"></i> Packs
-                        </span>
-                        <i id="packs-menu-icon"
-                            class="fas fa-chevron-down transition-transform duration-200"></i>
-                    </button>
-
-                    <div id="packs-menu-submenu" class="mt-2 ml-4 hidden">
-                        <ul class="space-y-1 pr-2">
                             <li>
-                                <a href="/creditpacks"
-                                    class="flex items-center px-4 py-2 rounded text-sm <%= isActive('creditpacks') %>">
-                                    <i class="fas fa-users mr-2 w-5 text-center flex-shrink-0"></i> Credit
-                                    Packs
+                                <a href="/settings/contact-messages" class="flex items-center px-4 py-2 rounded text-sm <%= isActive('settings/contact-messages') %>">
+                                    <i class="fas fa-envelope mr-2 w-5 text-center flex-shrink-0"></i> Contact Messages
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/settings/audit-log" class="flex items-center px-4 py-2 rounded text-sm <%= isActive('settings/audit-log') %>">
+                                    <i class="fas fa-history mr-2 w-5 text-center flex-shrink-0"></i> Audit Log
                                 </a>
                             </li>
                         </ul>
