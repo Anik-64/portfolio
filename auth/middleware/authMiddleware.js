@@ -56,36 +56,6 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
-// Function to authorize based on user roles
-const authorizeRoles = (allowedRoles) => (req, res, next) => {
-    try {
-        const primaryUserRole = req.user?.primaryuserroleno;
-        const userAllRoles = req.user?.userroles;
-    
-        if (!allowedRoles.includes(primaryUserRole)) {
-            let isAllowed = false;
-            for(let i=0; i<userAllRoles.length; i++){
-                let aRole = userAllRoles[i];
-                if(allowedRoles.includes(aRole['userroleno'])){
-                    isAllowed = true;
-                    break;
-                }
-            }
-
-            if(!isAllowed){
-                return res.status(403).json({
-                    error: true,
-                    message: 'Access denied, insufficient permissions!',
-                });
-            }
-        }
-    
-        next();
-    } catch(err) {
-        res.status(500).json({ error: "An error occurred while authorizing the user" });
-    }
-};
-
 // Middleware for rendering pages with authenticated user data
 const authenticateRender = (req, res, next) => {
     const token = req.cookies?.token || req.headers['authorization']?.split(' ')[1];
@@ -104,30 +74,16 @@ const authenticateRender = (req, res, next) => {
         req.user = user;
         res.locals.user = {
             fullname: user.fullname,
-            profilepicurl: user.profilepicurl,
-            primaryuserroleno: user.primaryuserroleno
+            profilepicurl: user.profilepicurl
         };
     });
 
     next();
 };
 
-const authorizeAdminRender = (req, res, next) => {
-    // Admin role = 1
-    if (req.user.primaryuserroleno === 1) { 
-        next();
-    } else {
-        res.render('pages/unauthorized', {
-            title: 'Unauthorized',
-            layout: false
-        });
-    }
-};
 
 module.exports = {
     generateTokens,
     authenticateToken,
-    authorizeRoles,
-    authenticateRender,
-    authorizeAdminRender,
+    authenticateRender
 };
