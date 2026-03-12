@@ -6,7 +6,7 @@ const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
 const cookieParser = require('cookie-parser');
 const routers = require('./routers/routers');
-const { login, signup, refreshToken, authenticateToken, authorizeRoles, authenticateRender, authorizeAdminRender } = require('./auth/routers/authRouters.js');
+const { login, signup, refreshToken, authenticateToken, authenticateRender } = require('./auth/routers/authRouters.js');
 const apiTestLogger = require('./auth/middleware/apiTestMiddleware');
 
 require('dotenv').config();
@@ -18,14 +18,7 @@ app.use('/api/v1', apiTestLogger);
 app.use(
     '/api/v1/upload',
     authenticateToken,
-    authorizeRoles([1, 2, 3, 4, 5, 6, 7, 8, 9, 11]),
     routers.profilePicRouter
-);
-app.use(
-    '/api/v1/books/upload',
-    authenticateToken,
-    authorizeRoles([1, 2, 3, 4, 5, 6, 7, 8, 9, 11]),
-    routers.bookUploadRouter
 );
 
 app.use(express.json());
@@ -85,7 +78,16 @@ app.get('/', (req, res) => {
 app.get('/login', (req, res) => {
     res.render('pages/login', {
         title: 'Login',
-        layout: false
+        layout: false,
+        firebaseConfig: {
+            apiKey: process.env.FIREBASE_API_KEY,
+            authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+            projectId: process.env.FIREBASE_PROJECT_ID,
+            storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+            messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+            appId: process.env.FIREBASE_APP_ID,
+            measurementId: process.env.FIREBASE_MEASUREMENT_ID
+        }
     });
 });
 
@@ -103,7 +105,7 @@ app.get('/unauthorized', (req, res) => {
     });
 });
 
-app.get('/dashboard', authenticateRender, authorizeAdminRender, (req, res) => {
+app.get('/dashboard', authenticateRender, (req, res) => {
     res.render('pages/dashboard', {
         layout: 'layout',
         title: 'Dashboard',
@@ -112,13 +114,95 @@ app.get('/dashboard', authenticateRender, authorizeAdminRender, (req, res) => {
         // cache: true,
     });
 });
-app.get('/currency', authenticateRender, authorizeAdminRender, (req, res) => {
+app.get('/currency', authenticateRender, (req, res) => {
     res.render('pages/currency', {
         layout: 'layout',
         title: 'Currency Settings',
         currentPath: 'currency',
         customJS: '/js/currency.js',
         // cache: true,
+    });
+});
+
+// Settings Frontend Routes
+app.get('/settings/skills', authenticateRender, (req, res) => {
+    res.render('pages/settings/skills', { 
+        layout: 'layout', 
+        title: 'Skills Settings', 
+        currentPath: 'settings/skills', 
+        customJS: '/js/settings/skills.js' 
+    });
+});
+app.get('/settings/experiences', authenticateRender, (req, res) => {
+    res.render('pages/settings/experiences', { 
+        layout: 'layout', 
+        title: 'Experiences Settings', 
+        currentPath: 'settings/experiences', 
+        customJS: '/js/settings/experiences.js' 
+    });
+});
+app.get('/settings/projects', authenticateRender, (req, res) => {
+    res.render('pages/settings/projects', { 
+        layout: 'layout', 
+        title: 'Projects Settings', 
+        currentPath: 'settings/projects', 
+        customJS: '/js/settings/projects.js' 
+    });
+});
+app.get('/settings/project-images', authenticateRender, (req, res) => {
+    res.render('pages/settings/project_images', { 
+        layout: 'layout', 
+        title: 'Project Images Settings', 
+        currentPath: 'settings/project-images', 
+        customJS: '/js/settings/project_images.js' 
+    });
+});
+app.get('/settings/certifications', authenticateRender, (req, res) => {
+    res.render('pages/settings/certifications', { 
+        layout: 'layout', 
+        title: 'Certifications Settings', 
+        currentPath: 'settings/certifications', 
+        customJS: '/js/settings/certifications.js' 
+    });
+});
+app.get('/settings/publications', authenticateRender, (req, res) => {
+    res.render('pages/settings/publications', { 
+        layout: 'layout', 
+        title: 'Publications Settings', 
+        currentPath: 'settings/publications', 
+        customJS: '/js/settings/publications.js' 
+    });
+});
+app.get('/settings/education', authenticateRender, (req, res) => {
+    res.render('pages/settings/education', { 
+        layout: 'layout', 
+        title: 'Education Settings', 
+        currentPath: 'settings/education', 
+        customJS: '/js/settings/education.js' 
+    });
+});
+app.get('/settings/trainings', authenticateRender, (req, res) => {
+    res.render('pages/settings/trainings', { 
+        layout: 'layout', 
+        title: 'Trainings Settings', 
+        currentPath: 'settings/trainings', 
+        customJS: '/js/settings/trainings.js' 
+    });
+});
+app.get('/settings/contact-messages', authenticateRender, (req, res) => {
+    res.render('pages/settings/contact_messages', { 
+        layout: 'layout', 
+        title: 'Contact Messages', 
+        currentPath: 'settings/contact-messages', 
+        customJS: '/js/settings/contact_messages.js' 
+    });
+});
+app.get('/settings/audit-log', authenticateRender, (req, res) => {
+    res.render('pages/settings/audit_log', { 
+        layout: 'layout', 
+        title: 'Audit Log', 
+        currentPath: 'settings/audit-log', 
+        customJS: '/js/settings/audit_log.js' 
     });
 });
 
@@ -130,8 +214,58 @@ app.use('/api/v1/refresh-token', authenticateToken, refreshToken);
 app.use(
     '/api/v1/currency',
     authenticateToken,
-    authorizeRoles([1, 2, 3]),
     routers.currencyRouter
+);
+
+app.use(
+    '/api/v1/settings/skills', 
+    authenticateToken, 
+    routers.skillsRouter
+);
+app.use(
+    '/api/v1/settings/experiences', 
+    authenticateToken, 
+    routers.experiencesRouter
+);
+app.use(
+    '/api/v1/settings/projects', 
+    authenticateToken, 
+    routers.projectsRouter
+);
+app.use(
+    '/api/v1/settings/project-images', 
+    authenticateToken, 
+    routers.projectImagesRouter
+);
+app.use(
+    '/api/v1/settings/certifications', 
+    authenticateToken, 
+    routers.certificationsRouter
+);
+app.use(
+    '/api/v1/settings/publications', 
+    authenticateToken, 
+    routers.publicationsRouter
+);
+app.use(
+    '/api/v1/settings/education', 
+    authenticateToken, 
+    routers.educationRouter
+);
+app.use(
+    '/api/v1/settings/trainings', 
+    authenticateToken, 
+    routers.trainingsRouter
+);
+app.use(
+    '/api/v1/settings/contact-messages', 
+    authenticateToken, 
+    routers.contactMessagesRouter
+);
+app.use(
+    '/api/v1/settings/audit-log', 
+    authenticateToken, 
+    routers.auditLogRouter
 );
 
 app.listen(process.env.PORT || 8080, () => {
