@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const query = searchInput.value.trim().toLowerCase();
         if (query) {
             const filtered = originalData.filter(item => 
-                (item.title || '').toLowerCase().includes(query) || 
+            (item.role || '').toLowerCase().includes(query) || 
                 (item.company || '').toLowerCase().includes(query)
             );
             renderData(filtered);
@@ -64,8 +64,9 @@ document.addEventListener('DOMContentLoaded', function() {
     dataForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const formData = {
-            title: document.getElementById('titleStr').value.trim(),
+            role: document.getElementById('titleStr').value.trim(),
             company: document.getElementById('company').value.trim(),
+            employment_type: document.getElementById('employment_type').value.trim() || null,
             location: document.getElementById('location').value.trim() || null,
             start_date: document.getElementById('start_date').value || null,
             end_date: document.getElementById('end_date').value || null,
@@ -80,8 +81,8 @@ document.addEventListener('DOMContentLoaded', function() {
             formData.end_date = null;
         }
 
-        if (!formData.title || !formData.company) {
-            showMessage('Title and Company are required', 'error');
+        if (!formData.role || !formData.company) {
+            showMessage('Role and Company are required', 'error');
             return;
         }
 
@@ -173,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!items || items.length === 0) {
             const row = dataTable.insertRow();
             const cell = row.insertCell(0);
-            cell.colSpan = 6;
+            cell.colSpan = 9;
             cell.textContent = 'No experiences found';
             cell.className = 'text-center py-4 text-black';
             return;
@@ -186,25 +187,48 @@ document.addEventListener('DOMContentLoaded', function() {
             idCell.textContent = index + 1;
             idCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-black';
             
-            const titleCell = row.insertCell(1);
-            titleCell.textContent = item.title;
-            titleCell.className = 'px-4 py-2 whitespace-nowrap text-sm font-medium text-black';
-            
-            const compCell = row.insertCell(2);
-            compCell.textContent = item.company;
-            compCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
+            const logoCell = row.insertCell(1);
+            logoCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-black';
+            if (item.company_logo_url) {
+                const img = document.createElement('img');
+                img.src = item.company_logo_url;
+                img.alt = item.company;
+                img.className = 'w-8 h-8 rounded-full object-cover border';
+                logoCell.appendChild(img);
+            } else {
+                logoCell.innerHTML = '<div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-400"><i class="fas fa-building text-xs"></i></div>';
+            }
 
-            const datesCell = row.insertCell(3);
+            const roleCompCell = row.insertCell(2);
+            roleCompCell.innerHTML = `
+                <div class="text-sm font-medium text-black">${item.role}</div>
+                <div class="text-xs text-gray-500">${item.company}</div>
+            `;
+            roleCompCell.className = 'px-4 py-2 whitespace-nowrap';
+
+            const empTypeCell = row.insertCell(3);
+            empTypeCell.textContent = item.employment_type || 'N/A';
+            empTypeCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
+
+            const locCell = row.insertCell(4);
+            locCell.textContent = item.location || 'N/A';
+            locCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
+
+            const datesCell = row.insertCell(5);
             const start = item.start_date ? new Date(item.start_date).toLocaleDateString() : 'N/A';
             const end = item.is_current ? 'Present' : (item.end_date ? new Date(item.end_date).toLocaleDateString() : 'N/A');
             datesCell.textContent = `${start} - ${end}`;
             datesCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
 
-            const visCell = row.insertCell(4);
+            const orderCell = row.insertCell(6);
+            orderCell.textContent = item.display_order;
+            orderCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
+
+            const visCell = row.insertCell(7);
             visCell.innerHTML = item.is_visible ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Yes</span>' : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">No</span>';
             visCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
 
-            const actionsCell = row.insertCell(5);
+            const actionsCell = row.insertCell(8);
             actionsCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-black text-right';
 
             const actionButtons = document.createElement('div');
@@ -256,8 +280,9 @@ document.addEventListener('DOMContentLoaded', function() {
         currentId = id;
         modalTitle.textContent = 'Edit Experience';
         
-        document.getElementById('titleStr').value = itemData.title || '';
+        document.getElementById('titleStr').value = itemData.role || '';
         document.getElementById('company').value = itemData.company || '';
+        document.getElementById('employment_type').value = itemData.employment_type || '';
         document.getElementById('location').value = itemData.location || '';
         document.getElementById('start_date').value = itemData.start_date ? itemData.start_date.split('T')[0] : '';
         document.getElementById('end_date').value = itemData.end_date ? itemData.end_date.split('T')[0] : '';
