@@ -1,4 +1,4 @@
--- SKILLS
+-- SKILLS (Done)
 CREATE TABLE skills (
   id SERIAL PRIMARY KEY,
   category VARCHAR(100) NOT NULL,              -- e.g. "DevOps & Cloud", "Backend"
@@ -9,7 +9,7 @@ CREATE TABLE skills (
   UNIQUE(category, name)
 );
 
--- WORK EXPERIENCE
+-- WORK EXPERIENCE (Done)
 CREATE TABLE experiences (
   id SERIAL PRIMARY KEY,
   company VARCHAR(255) NOT NULL,
