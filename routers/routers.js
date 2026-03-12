@@ -12,5 +12,6 @@ module.exports = {
     educationRouter: require('../server/settings/education'),
     trainingsRouter: require('../server/settings/trainings'),
     contactMessagesRouter: require('../server/settings/contact_messages'),
-    auditLogRouter: require('../server/settings/audit_log')
+    auditLogRouter: require('../server/settings/audit_log'),
+    profileRouter: require('../server/profile')
 };
