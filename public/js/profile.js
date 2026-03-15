@@ -56,8 +56,21 @@ document.addEventListener('DOMContentLoaded', function() {
             profilePic.src = data.profilepicurl;
             showMessage('Profile picture updated!', 'success');
             
-            // Optionally update the background data as well
-            saveProfileData({ profilepicurl: data.profilepicurl }, true);
+            // Collect current form data to include with the new pic URL (to satisfy backend validation)
+            const taglineStr = document.getElementById('tagline').value.trim();
+            const taglineArray = taglineStr ? taglineStr.split(',').map(s => s.trim()).filter(s => s !== '') : [];
+
+            const fullProfileData = {
+                firstname: document.getElementById('firstName').value.trim(),
+                lastname: document.getElementById('lastName').value.trim() || null,
+                tagline: taglineArray,
+                bio: document.getElementById('bio').value.trim() || null,
+                resume_url: document.getElementById('resumeUrl').value.trim() || null,
+                years_of_experience: parseInt(document.getElementById('experience').value) || 0,
+                profilepicurl: data.profilepicurl
+            };
+
+            saveProfileData(fullProfileData, true);
         } catch (err) {
             console.error(err);
             showMessage('Upload failed', 'error');
@@ -77,7 +90,8 @@ document.addEventListener('DOMContentLoaded', function() {
             tagline: taglineArray,
             bio: document.getElementById('bio').value.trim() || null,
             resume_url: document.getElementById('resumeUrl').value.trim() || null,
-            years_of_experience: parseInt(document.getElementById('experience').value) || 0
+            years_of_experience: parseInt(document.getElementById('experience').value) || 0,
+            profilepicurl: profilePic.src.startsWith('data:') ? null : profilePic.src // If it's a base64 from a previous failed load or placeholder, handle it
         };
 
         saveProfileData(formData);
