@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
         modalTitle.textContent = 'Add Training';
         dataForm.reset();
         document.getElementById('is_visible').checked = true;
-        document.getElementById('display_order').value = 0;
         dataModal.classList.remove('hidden');
     });
 
@@ -38,8 +37,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const query = searchInput.value.trim().toLowerCase();
         if (query) {
             const filtered = originalData.filter(item => 
-                (item.title || '').toLowerCase().includes(query) || 
-                (item.organization || '').toLowerCase().includes(query)
+                (item.program_name || '').toLowerCase().includes(query) || 
+                (item.institute || '').toLowerCase().includes(query)
             );
             renderData(filtered);
         } else {
@@ -51,16 +50,16 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         
         const formData = {
-            title: document.getElementById('titleStr').value.trim(),
-            organization: document.getElementById('organization').value.trim() || null,
-            completion_year: parseInt(document.getElementById('completion_year').value) || null,
+            program_name: document.getElementById('program_name').value.trim(),
+            institute: document.getElementById('institute').value.trim(),
+            start_date: document.getElementById('start_date').value || null,
+            end_date: document.getElementById('end_date').value || null,
             certificate_url: document.getElementById('certificate_url').value.trim() || null,
-            display_order: parseInt(document.getElementById('display_order').value) || 0,
             is_visible: document.getElementById('is_visible').checked
         };
 
-        if (!formData.title) {
-            showMessage('Title is required', 'error');
+        if (!formData.program_name || !formData.institute) {
+            showMessage('Program name and Institute are required', 'error');
             return;
         }
 
@@ -166,16 +165,18 @@ document.addEventListener('DOMContentLoaded', function() {
             idCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-black';
             
             const titleCell = row.insertCell(1);
-            titleCell.textContent = item.title;
+            titleCell.textContent = item.program_name;
             titleCell.className = 'px-4 py-2 whitespace-nowrap text-sm font-medium text-black';
             
             const orgCell = row.insertCell(2);
-            orgCell.textContent = item.organization || '-';
+            orgCell.textContent = item.institute || '-';
             orgCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
 
-            const yearCell = row.insertCell(3);
-            yearCell.textContent = item.completion_year || 'N/A';
-            yearCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
+            const durationCell = row.insertCell(3);
+            const start = item.start_date ? new Date(item.start_date).toLocaleDateString() : '';
+            const end = item.end_date ? new Date(item.end_date).toLocaleDateString() : (item.start_date ? 'Present' : 'N/A');
+            durationCell.textContent = item.start_date ? `${start} - ${end}` : 'N/A';
+            durationCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
 
             const visCell = row.insertCell(4);
             visCell.innerHTML = item.is_visible ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Yes</span>' : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">No</span>';
@@ -233,11 +234,11 @@ document.addEventListener('DOMContentLoaded', function() {
         currentId = id;
         modalTitle.textContent = 'Edit Training';
         
-        document.getElementById('titleStr').value = itemData.title || '';
-        document.getElementById('organization').value = itemData.organization || '';
-        document.getElementById('completion_year').value = itemData.completion_year || '';
+        document.getElementById('program_name').value = itemData.program_name || '';
+        document.getElementById('institute').value = itemData.institute || '';
+        document.getElementById('start_date').value = itemData.start_date ? itemData.start_date.split('T')[0] : '';
+        document.getElementById('end_date').value = itemData.end_date ? itemData.end_date.split('T')[0] : '';
         document.getElementById('certificate_url').value = itemData.certificate_url || '';
-        document.getElementById('display_order').value = itemData.display_order || 0;
         document.getElementById('is_visible').checked = itemData.is_visible;
 
         dataModal.classList.remove('hidden');
