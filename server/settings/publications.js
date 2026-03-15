@@ -43,6 +43,7 @@ publicationsRouter.post('/',
         body('journal_name').optional({ nullable: true, checkFalsy: true }).isString().trim().escape().isLength({ max: 255 }),
         body('publisher').optional({ nullable: true, checkFalsy: true }).isString().trim().escape().isLength({ max: 255 }),
         body('authors').optional({ nullable: true, checkFalsy: true }).isArray(),
+        body('author_linkedin_urls').optional({ nullable: true, checkFalsy: true }).isArray(),
         body('abstract').optional({ nullable: true, checkFalsy: true }).isString().trim(),
         body('published_date').optional({ nullable: true, checkFalsy: true }).isISO8601(),
         body('doi').optional({ nullable: true, checkFalsy: true }).isString().trim().escape().isLength({ max: 255 }),
@@ -55,15 +56,15 @@ publicationsRouter.post('/',
         const errors = validationResult(req);
         if (!errors.isEmpty()) return res.status(400).json({ error: true, message: errors.array()[0].msg });
 
-        const { title, journal_name, publisher, authors, abstract, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible } = req.body;
+        const { title, journal_name, publisher, authors, author_linkedin_urls, abstract, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible } = req.body;
         
         const query = `
-            INSERT INTO publications (title, journal_name, publisher, authors, abstract, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, COALESCE($11, true))
+            INSERT INTO publications (title, journal_name, publisher, authors, author_linkedin_urls, abstract, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, COALESCE($12, true))
             RETURNING *
         `;
         try {
-            const result = await pool.query(query, [title, journal_name, publisher, authors, abstract?xss(abstract):null, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible]);
+            const result = await pool.query(query, [title, journal_name, publisher, authors, author_linkedin_urls, abstract?xss(abstract):null, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible]);
             res.status(201).json({ error: false, message: 'Publication created successfully', data: result.rows[0] });
         } catch (err) {
             console.error(err);
@@ -79,6 +80,7 @@ publicationsRouter.put('/:id',
         body('journal_name').optional({ nullable: true, checkFalsy: true }).isString().trim().escape().isLength({ max: 255 }),
         body('publisher').optional({ nullable: true, checkFalsy: true }).isString().trim().escape().isLength({ max: 255 }),
         body('authors').optional({ nullable: true, checkFalsy: true }).isArray(),
+        body('author_linkedin_urls').optional({ nullable: true, checkFalsy: true }).isArray(),
         body('abstract').optional({ nullable: true, checkFalsy: true }).isString().trim(),
         body('published_date').optional({ nullable: true, checkFalsy: true }).isISO8601(),
         body('doi').optional({ nullable: true, checkFalsy: true }).isString().trim().escape().isLength({ max: 255 }),
@@ -91,16 +93,16 @@ publicationsRouter.put('/:id',
         const errors = validationResult(req);
         if (!errors.isEmpty()) return res.status(400).json({ error: true, message: errors.array()[0].msg });
 
-        const { title, journal_name, publisher, authors, abstract, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible } = req.body;
+        const { title, journal_name, publisher, authors, author_linkedin_urls, abstract, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible } = req.body;
         
         const query = `
             UPDATE publications 
-            SET title=$2, journal_name=$3, publisher=$4, authors=$5, abstract=$6, published_date=$7, doi=$8, publication_url=$9, pdf_url=$10, thumbnail_url=$11, is_visible=COALESCE($12, is_visible)
+            SET title=$2, journal_name=$3, publisher=$4, authors=$5, author_linkedin_urls=$6, abstract=$7, published_date=$8, doi=$9, publication_url=$10, pdf_url=$11, thumbnail_url=$12, is_visible=COALESCE($13, is_visible)
             WHERE id = $1
             RETURNING *
         `;
         try {
-            const result = await pool.query(query, [req.params.id, title, journal_name, publisher, authors, abstract?xss(abstract):null, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible]);
+            const result = await pool.query(query, [req.params.id, title, journal_name, publisher, authors, author_linkedin_urls, abstract?xss(abstract):null, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Publication not found!' });
             res.status(200).json({ error: false, message: 'Publication updated successfully', data: result.rows[0] });
         } catch (err) {
