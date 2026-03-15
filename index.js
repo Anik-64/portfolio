@@ -66,8 +66,8 @@ app.use(express.static('public'));
 app.use(expressLayouts);
 
 app.use((req, res, next) => {
-    res.locals.appName = 'Ebook Admin';
-    res.locals.message = 'Welcome to Ebook API Service!';
+    res.locals.appName = 'Portfolio Admin';
+    res.locals.message = 'Welcome to Portfolio API Service!';
     res.locals.layout = 'layout';
     next();
 });
