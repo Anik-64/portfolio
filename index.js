@@ -7,13 +7,11 @@ const expressLayouts = require('express-ejs-layouts');
 const cookieParser = require('cookie-parser');
 const routers = require('./routers/routers');
 const { login, signup, refreshToken, authenticateToken, authenticateRender } = require('./auth/routers/authRouters.js');
-const apiTestLogger = require('./auth/middleware/apiTestMiddleware');
 
 require('dotenv').config();
 
 const app = express();
 app.use(cookieParser());
-app.use('/api/v1', apiTestLogger);
 
 app.use(
     '/api/v1/upload',
