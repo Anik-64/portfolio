@@ -66,13 +66,14 @@ CREATE TABLE certifications (
   is_visible BOOLEAN DEFAULT true
 );
 
--- PUBLICATIONS / JOURNALS
+-- PUBLICATIONS / JOURNALS (Done)
 CREATE TABLE publications (
   id SERIAL PRIMARY KEY,
   title VARCHAR(500) NOT NULL,
   journal_name VARCHAR(255),
   publisher VARCHAR(255),
   authors TEXT[], -- multiple authors supported
+  author_linkedin_urls TEXT[], -- matching linkedin urls
   abstract TEXT,
   published_date DATE,
   doi VARCHAR(255),
@@ -82,6 +83,7 @@ CREATE TABLE publications (
   is_visible BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+-- ALTER TABLE publications ADD COLUMN author_linkedin_urls TEXT[];
 
 -- EDUCATION
 CREATE TABLE education (
