@@ -182,8 +182,7 @@ registrationRouter.post('/',
 
             res.status(201).json({
                 error: false,
-                message: 'Registration successful',
-                referralcode: newReferralCode
+                message: 'Registration successful'
             });
         } catch (err) {
             await pool.query("ROLLBACK");
