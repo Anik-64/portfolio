@@ -21,9 +21,9 @@
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">ID</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Title</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Organization</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Completion Year</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Program Name</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Institute</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Duration</th>
                             <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Visible</th>
                             <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider">Actions</th>
                         </tr>
@@ -51,8 +51,8 @@
             <form id="dataForm">
                 <div class="mb-4">
                     <label class="block mb-1 text-gray-700">
-                        Title <span class="text-red-500">*</span>
-                        <input id="titleStr" name="title" required
+                        Program Name <span class="text-red-500">*</span>
+                        <input id="program_name" name="program_name" required
                             class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
                             type="text" placeholder="e.g., Agile Scrum Master Training">
                     </label>
@@ -60,20 +60,30 @@
                 
                 <div class="mb-4">
                     <label class="block mb-1 text-gray-700">
-                        Organization
-                        <input id="organization" name="organization"
+                        Institute <span class="text-red-500">*</span>
+                        <input id="institute" name="institute" required
                             class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
                             type="text" placeholder="e.g., Scrum Alliance">
                     </label>
                 </div>
 
-                <div class="mb-4 w-1/2">
-                    <label class="block mb-1 text-gray-700">
-                        Completion Year
-                        <input id="completion_year" name="completion_year"
-                            class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                            type="number" min="1900" max="2100" placeholder="e.g., 2023">
-                    </label>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block mb-1 text-gray-700">
+                            Start Date
+                            <input id="start_date" name="start_date"
+                                class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                type="date">
+                        </label>
+                    </div>
+                    <div>
+                        <label class="block mb-1 text-gray-700">
+                            End Date
+                            <input id="end_date" name="end_date"
+                                class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                type="date">
+                        </label>
+                    </div>
                 </div>
 
                 <div class="mb-4">
@@ -89,15 +99,6 @@
                     <label class="flex items-center text-gray-700">
                         <input id="is_visible" name="is_visible" type="checkbox" class="mr-2" checked>
                         Is Visible
-                    </label>
-                </div>
-
-                <div class="mb-4 w-1/2">
-                    <label class="block mb-1 text-gray-700">
-                        Display Order
-                        <input id="display_order" name="display_order"
-                            class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                            type="number" value="0">
                     </label>
                 </div>
                 
