@@ -49,7 +49,7 @@ publicationsRouter.post('/',
         body('publication_url').optional({ nullable: true, checkFalsy: true }).isURL(),
         body('pdf_url').optional({ nullable: true, checkFalsy: true }).isURL(),
         body('thumbnail_url').optional({ nullable: true, checkFalsy: true }).isURL(),
-        body('is_visible').optional({ nullable: true, checkFalsy: true }).isBoolean().toBoolean()
+        body('is_visible').optional({ nullable: true }).isBoolean().toBoolean()
     ],
     async (req, res) => {
         const errors = validationResult(req);
@@ -85,7 +85,7 @@ publicationsRouter.put('/:id',
         body('publication_url').optional({ nullable: true, checkFalsy: true }).isURL(),
         body('pdf_url').optional({ nullable: true, checkFalsy: true }).isURL(),
         body('thumbnail_url').optional({ nullable: true, checkFalsy: true }).isURL(),
-        body('is_visible').optional({ nullable: true, checkFalsy: true }).isBoolean().toBoolean()
+        body('is_visible').optional({ nullable: true }).isBoolean().toBoolean()
     ],
     async (req, res) => {
         const errors = validationResult(req);
