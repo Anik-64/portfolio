@@ -50,12 +50,20 @@ document.addEventListener('DOMContentLoaded', function() {
     dataForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
+        const authorsValue = document.getElementById('authors').value.trim();
+        const authorsArray = authorsValue ? authorsValue.split(',').map(s => s.trim()).filter(s => s) : [];
+
         const formData = {
             title: document.getElementById('titleStr').value.trim(),
+            journal_name: document.getElementById('journal_name').value.trim() || null,
             publisher: document.getElementById('publisher').value.trim() || null,
-            publication_date: document.getElementById('publication_date').value || null,
+            authors: authorsArray,
+            abstract: document.getElementById('abstract').value.trim() || null,
+            published_date: document.getElementById('publication_date').value || null,
+            doi: document.getElementById('doi').value.trim() || null,
             publication_url: document.getElementById('publication_url').value.trim() || null,
-            description: document.getElementById('description').value.trim() || null,
+            pdf_url: document.getElementById('pdf_url').value.trim() || null,
+            thumbnail_url: document.getElementById('thumbnail_url').value.trim() || null,
             display_order: parseInt(document.getElementById('display_order').value) || 0,
             is_visible: document.getElementById('is_visible').checked
         };
@@ -149,60 +157,126 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderData(items) {
-        dataTable.innerHTML = '';
+        const container = document.querySelector('.table-container');
+        
         if (!items || items.length === 0) {
-            const row = dataTable.insertRow();
-            const cell = row.insertCell(0);
-            cell.colSpan = 6;
-            cell.textContent = 'No publications found';
-            cell.className = 'text-center py-4 text-black';
+            container.innerHTML = `
+                <div class="text-center py-10 text-gray-500">
+                    <i class="fas fa-book-open text-4xl mb-3 block opacity-20"></i>
+                    No publications found
+                </div>
+            `;
             return;
         }
 
-        items.forEach((item, index) => {
-            const row = dataTable.insertRow();
-
-            const idCell = row.insertCell(0);
-            idCell.textContent = index + 1;
-            idCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-black';
-            
-            const titleCell = row.insertCell(1);
-            titleCell.textContent = item.title;
-            titleCell.className = 'px-4 py-2 whitespace-nowrap text-sm font-medium text-black';
-            
-            const pCell = row.insertCell(2);
-            pCell.textContent = item.publisher || '-';
-            pCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
-
-            const dCell = row.insertCell(3);
-            dCell.textContent = item.publication_date ? new Date(item.publication_date).toLocaleDateString() : 'N/A';
-            dCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
-
-            const visCell = row.insertCell(4);
-            visCell.innerHTML = item.is_visible ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Yes</span>' : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">No</span>';
-            visCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
-
-            const actionsCell = row.insertCell(5);
-            actionsCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-black text-right';
-
-            const actionButtons = document.createElement('div');
-            actionButtons.className = 'flex justify-end gap-2';
-            
-            const editBtn = document.createElement('button');
-            editBtn.innerHTML = '<i class="fas fa-edit"></i>';
-            editBtn.className = 'bg-yellow-500 hover:bg-yellow-600 text-white rounded px-2 py-1';
-            editBtn.addEventListener('click', () => editDataItem(item.id));
-
-            const deleteBtn = document.createElement('button');
-            deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
-            deleteBtn.className = 'bg-red-500 hover:bg-red-600 text-white rounded px-2 py-1';
-            deleteBtn.addEventListener('click', () => confirmDeleteData(item.id));
-
-            actionButtons.appendChild(editBtn);
-            actionButtons.appendChild(deleteBtn);
-            actionsCell.appendChild(actionButtons);
-        });
+        // Dynamic Formation: Card view for 1 or 2 items, Table for 3+
+        if (items.length <= 2) {
+            renderCardView(items, container);
+        } else {
+            renderTableView(items, container);
+        }
     }
+
+    function renderCardView(items, container) {
+        let cardsHtml = '<div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-2">';
+        
+        items.forEach(item => {
+            // Fix: Use UTC to avoid timezone shifts for DATE columns
+            const dateStr = item.published_date ? new Date(item.published_date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' }) : 'N/A';
+            const authorsStr = (item.authors && item.authors.length > 0) ? item.authors.join(', ') : 'Unknown Authors';
+            const thumbUrl = item.thumbnail_url || 'https://via.placeholder.com/150x200?text=No+Cover';
+            
+            cardsHtml += `
+                <div class="bg-gray-50 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-100 flex flex-col md:flex-row h-full">
+                    <div class="w-full md:w-1/3 bg-gray-200 flex items-center justify-center p-2">
+                        <img src="${thumbUrl}" alt="Thumbnail" class="max-h-48 object-contain shadow-sm rounded">
+                    </div>
+                    <div class="p-4 flex-1 flex flex-col">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
+                                ${item.journal_name || item.publisher || 'Publication'}
+                            </span>
+                            <div class="flex gap-2">
+                                <button onclick="editDataItem(${item.id})" class="text-yellow-500 hover:text-yellow-600"><i class="fas fa-edit"></i></button>
+                                <button onclick="confirmDeleteData(${item.id})" class="text-red-500 hover:text-red-600"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-lg leading-tight mb-2 text-gray-900">${item.title}</h3>
+                        <p class="text-xs text-gray-500 mb-2 italic">By ${authorsStr}</p>
+                        <p class="text-sm text-gray-600 flex-1 line-clamp-3 mb-4">${item.abstract || 'No abstract available.'}</p>
+                        <div class="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
+                            <span class="text-xs text-gray-400"><i class="far fa-calendar-alt mr-1"></i> ${dateStr}</span>
+                            <div class="flex gap-2">
+                                ${item.publication_url ? `<a href="${item.publication_url}" target="_blank" class="text-blue-500 hover:text-blue-600 text-xs font-medium">Link <i class="fas fa-external-link-alt text-[10px]"></i></a>` : ''}
+                                ${item.pdf_url ? `<a href="${item.pdf_url}" target="_blank" class="text-red-500 hover:text-red-600 text-xs font-medium">PDF <i class="fas fa-file-pdf text-[10px]"></i></a>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        cardsHtml += '</div>';
+        container.innerHTML = cardsHtml;
+    }
+
+    function renderTableView(items, container) {
+        container.innerHTML = `
+            <div class="table-responsive">
+                <table id="dataTable" class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">ID</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Thumbnail</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Title</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Authors</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Journal/Publisher</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Visible</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        ${items.map((item, index) => {
+                            // Fix: Use UTC to avoid timezone shifts for DATE columns
+                            const dateStr = item.published_date ? new Date(item.published_date).toLocaleDateString(undefined, {timeZone: 'UTC'}) : 'N/A';
+                            const thumbUrl = item.thumbnail_url || 'https://via.placeholder.com/40x50?text=No+Cover';
+                            const journalPublisher = item.journal_name || item.publisher || '-';
+                            const authorsStr = (item.authors && item.authors.length > 0) ? item.authors.join(', ') : '-';
+                            
+                            return `
+                                <tr>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${index + 1}</td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <img src="${thumbUrl}" alt="Thumbnail" class="h-10 w-8 object-cover rounded shadow-sm">
+                                    </td>
+                                    <td class="px-4 py-3 text-sm font-medium text-gray-900 max-w-xs truncate" title="${item.title}">${item.title}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-500 max-w-xs truncate" title="${authorsStr}">${authorsStr}</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${journalPublisher}</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${dateStr}</td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        ${item.is_visible 
+                                            ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Yes</span>' 
+                                            : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">No</span>'}
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                                        <div class="flex justify-end gap-2">
+                                            <button onclick="editDataItem(${item.id})" class="bg-yellow-500 hover:bg-yellow-600 text-white rounded px-2 py-1"><i class="fas fa-edit"></i></button>
+                                            <button onclick="confirmDeleteData(${item.id})" class="bg-red-500 hover:bg-red-600 text-white rounded px-2 py-1"><i class="fas fa-trash-alt"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    // Make functions globally available for inline onclick handlers
+    window.editDataItem = editDataItem;
+    window.confirmDeleteData = confirmDeleteData;
 
     async function createData(postData) {
         const response = await fetchWithToken('/api/v1/settings/publications', {
@@ -235,10 +309,15 @@ document.addEventListener('DOMContentLoaded', function() {
         modalTitle.textContent = 'Edit Publication';
         
         document.getElementById('titleStr').value = itemData.title || '';
+        document.getElementById('journal_name').value = itemData.journal_name || '';
         document.getElementById('publisher').value = itemData.publisher || '';
-        document.getElementById('publication_date').value = itemData.publication_date ? itemData.publication_date.split('T')[0] : '';
+        document.getElementById('authors').value = (itemData.authors && Array.isArray(itemData.authors)) ? itemData.authors.join(', ') : '';
+        document.getElementById('abstract').value = itemData.abstract || '';
+        document.getElementById('publication_date').value = itemData.published_date ? new Date(itemData.published_date).toISOString().split('T')[0] : '';
+        document.getElementById('doi').value = itemData.doi || '';
         document.getElementById('publication_url').value = itemData.publication_url || '';
-        document.getElementById('description').value = itemData.description || '';
+        document.getElementById('pdf_url').value = itemData.pdf_url || '';
+        document.getElementById('thumbnail_url').value = itemData.thumbnail_url || '';
         document.getElementById('display_order').value = itemData.display_order || 0;
         document.getElementById('is_visible').checked = itemData.is_visible;
 
