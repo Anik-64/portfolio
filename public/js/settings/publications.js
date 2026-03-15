@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
         modalTitle.textContent = 'Add Publication';
         dataForm.reset();
         document.getElementById('is_visible').checked = true;
-        document.getElementById('display_order').value = 0;
         dataModal.classList.remove('hidden');
     });
 
@@ -53,18 +52,21 @@ document.addEventListener('DOMContentLoaded', function() {
         const authorsValue = document.getElementById('authors').value.trim();
         const authorsArray = authorsValue ? authorsValue.split(',').map(s => s.trim()).filter(s => s) : [];
 
+        const linkedinValue = document.getElementById('author_linkedin_urls').value.trim();
+        const linkedinArray = linkedinValue ? linkedinValue.split(',').map(s => s.trim()).filter(s => s) : [];
+
         const formData = {
             title: document.getElementById('titleStr').value.trim(),
             journal_name: document.getElementById('journal_name').value.trim() || null,
             publisher: document.getElementById('publisher').value.trim() || null,
             authors: authorsArray,
+            author_linkedin_urls: linkedinArray,
             abstract: document.getElementById('abstract').value.trim() || null,
             published_date: document.getElementById('publication_date').value || null,
             doi: document.getElementById('doi').value.trim() || null,
             publication_url: document.getElementById('publication_url').value.trim() || null,
             pdf_url: document.getElementById('pdf_url').value.trim() || null,
             thumbnail_url: document.getElementById('thumbnail_url').value.trim() || null,
-            display_order: parseInt(document.getElementById('display_order').value) || 0,
             is_visible: document.getElementById('is_visible').checked
         };
 
@@ -177,14 +179,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function renderAuthors(item) {
+        if (!item.authors || item.authors.length === 0) return '-';
+        
+        return item.authors.map((author, index) => {
+            const url = (item.author_linkedin_urls && item.author_linkedin_urls[index]) ? item.author_linkedin_urls[index] : null;
+            if (url) {
+                return `<a href="${url}" target="_blank" class="text-blue-600 hover:underline"><i class="fab fa-linkedin text-[10px] mr-1"></i>${author}</a>`;
+            }
+            return author;
+        }).join(', ');
+    }
+
     function renderCardView(items, container) {
         let cardsHtml = '<div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-2">';
         
         items.forEach(item => {
             // Fix: Use UTC to avoid timezone shifts for DATE columns
             const dateStr = item.published_date ? new Date(item.published_date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' }) : 'N/A';
-            const authorsStr = (item.authors && item.authors.length > 0) ? item.authors.join(', ') : 'Unknown Authors';
             const thumbUrl = item.thumbnail_url || 'https://via.placeholder.com/150x200?text=No+Cover';
+            const authorsHtml = renderAuthors(item);
             
             cardsHtml += `
                 <div class="bg-gray-50 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-100 flex flex-col md:flex-row h-full">
@@ -202,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                         </div>
                         <h3 class="font-bold text-lg leading-tight mb-2 text-gray-900">${item.title}</h3>
-                        <p class="text-xs text-gray-500 mb-2 italic">By ${authorsStr}</p>
+                        <p class="text-xs text-gray-500 mb-2 italic">By ${authorsHtml}</p>
                         <p class="text-sm text-gray-600 flex-1 line-clamp-3 mb-4">${item.abstract || 'No abstract available.'}</p>
                         <div class="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
                             <span class="text-xs text-gray-400"><i class="far fa-calendar-alt mr-1"></i> ${dateStr}</span>
@@ -242,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             const dateStr = item.published_date ? new Date(item.published_date).toLocaleDateString(undefined, {timeZone: 'UTC'}) : 'N/A';
                             const thumbUrl = item.thumbnail_url || 'https://via.placeholder.com/40x50?text=No+Cover';
                             const journalPublisher = item.journal_name || item.publisher || '-';
-                            const authorsStr = (item.authors && item.authors.length > 0) ? item.authors.join(', ') : '-';
+                            const authorsHtml = renderAuthors(item);
                             
                             return `
                                 <tr>
@@ -251,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <img src="${thumbUrl}" alt="Thumbnail" class="h-10 w-8 object-cover rounded shadow-sm">
                                     </td>
                                     <td class="px-4 py-3 text-sm font-medium text-gray-900 max-w-xs truncate" title="${item.title}">${item.title}</td>
-                                    <td class="px-4 py-3 text-sm text-gray-500 max-w-xs truncate" title="${authorsStr}">${authorsStr}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-500 max-w-xs truncate" title="${item.authors ? item.authors.join(', ') : '-'}">${authorsHtml}</td>
                                     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${journalPublisher}</td>
                                     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${dateStr}</td>
                                     <td class="px-4 py-3 whitespace-nowrap">
@@ -312,13 +326,13 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('journal_name').value = itemData.journal_name || '';
         document.getElementById('publisher').value = itemData.publisher || '';
         document.getElementById('authors').value = (itemData.authors && Array.isArray(itemData.authors)) ? itemData.authors.join(', ') : '';
+        document.getElementById('author_linkedin_urls').value = (itemData.author_linkedin_urls && Array.isArray(itemData.author_linkedin_urls)) ? itemData.author_linkedin_urls.join(', ') : '';
         document.getElementById('abstract').value = itemData.abstract || '';
         document.getElementById('publication_date').value = itemData.published_date ? new Date(itemData.published_date).toISOString().split('T')[0] : '';
         document.getElementById('doi').value = itemData.doi || '';
         document.getElementById('publication_url').value = itemData.publication_url || '';
         document.getElementById('pdf_url').value = itemData.pdf_url || '';
         document.getElementById('thumbnail_url').value = itemData.thumbnail_url || '';
-        document.getElementById('display_order').value = itemData.display_order || 0;
         document.getElementById('is_visible').checked = itemData.is_visible;
 
         dataModal.classList.remove('hidden');
