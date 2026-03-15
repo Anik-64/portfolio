@@ -4,7 +4,7 @@ CREATE TABLE gen_contacttype(
     contacttypetitle VARCHAR(63) NOT NULL 
 );
 -- INSERT INTO gen_contacttype(contacttypetitle)
--- VALUES ('Phone'), ('Mobile'), ('Email'), ('Fax'), ('Website'), ('GitHub'), ('LinkedIn'), ('Twitter'), ('Medium');
+-- VALUES ('Phone'), ('Mobile'), ('Email'), ('Website'), ('GitHub'), ('LinkedIn');
 
 -- gen_peopleprimary (peopleno, peopleid, firstname, lastname, nid, age, dob, gendersetno, bloodgroup, street, postcode, country, emergencycontact, profilepicurl, validated, createdatetime, faf_parentpeopleno)
 CREATE TABLE gen_peopleprimary (
