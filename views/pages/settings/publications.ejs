@@ -83,6 +83,14 @@
                                 type="text" placeholder="e.g., John Doe, Jane Smith">
                         </label>
                     </div>
+                    <div class="mb-4 col-span-1 md:col-span-2">
+                        <label class="block mb-1 text-gray-700">
+                            Author LinkedIn URLs (Comma separated, matching authors order)
+                            <input id="author_linkedin_urls" name="author_linkedin_urls"
+                                class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                type="text" placeholder="e.g., https://linkedin.com/in/johndoe, https://linkedin.com/in/janesmith">
+                        </label>
+                    </div>
                     <div class="mb-4">
                         <label class="block mb-1 text-gray-700">
                             Publication Date
@@ -138,15 +146,6 @@
                     <label class="flex items-center text-gray-700">
                         <input id="is_visible" name="is_visible" type="checkbox" class="mr-2" checked>
                         Is Visible
-                    </label>
-                </div>
-
-                <div class="mb-4 w-1/2">
-                    <label class="block mb-1 text-gray-700">
-                        Display Order
-                        <input id="display_order" name="display_order"
-                            class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                            type="number" value="0">
                     </label>
                 </div>
                 
