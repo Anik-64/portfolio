@@ -21,8 +21,9 @@
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">ID</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Thumbnail</th>
                             <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Title</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Publisher</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Journal/Publisher</th>
                             <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Date</th>
                             <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Visible</th>
                             <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider">Actions</th>
@@ -50,7 +51,7 @@
             <span class="text-xs text-gray-500 italic block mb-2"><span class="text-red-500">*</span> = Required</span>
             <form id="dataForm">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="mb-4">
+                    <div class="mb-4 col-span-1 md:col-span-2">
                         <label class="block mb-1 text-gray-700">
                             Title <span class="text-red-500">*</span>
                             <input id="titleStr" name="title" required
@@ -60,10 +61,26 @@
                     </div>
                     <div class="mb-4">
                         <label class="block mb-1 text-gray-700">
+                            Journal Name
+                            <input id="journal_name" name="journal_name"
+                                class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                type="text" placeholder="e.g., Nature Communications">
+                        </label>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block mb-1 text-gray-700">
                             Publisher
                             <input id="publisher" name="publisher"
                                 class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
                                 type="text" placeholder="e.g., IEEE">
+                        </label>
+                    </div>
+                    <div class="mb-4 col-span-1 md:col-span-2">
+                        <label class="block mb-1 text-gray-700">
+                            Authors (Comma separated)
+                            <input id="authors" name="authors"
+                                class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                type="text" placeholder="e.g., John Doe, Jane Smith">
                         </label>
                     </div>
                     <div class="mb-4">
@@ -76,18 +93,42 @@
                     </div>
                     <div class="mb-4">
                         <label class="block mb-1 text-gray-700">
+                            DOI
+                            <input id="doi" name="doi"
+                                class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                type="text" placeholder="e.g., 10.1038/s41467-020-18151-2">
+                        </label>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block mb-1 text-gray-700">
                             Publication URL
                             <input id="publication_url" name="publication_url"
                                 class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
                                 type="url" placeholder="https://example.com/publication">
                         </label>
                     </div>
+                    <div class="mb-4">
+                        <label class="block mb-1 text-gray-700">
+                            PDF URL (Google Cloud Storage)
+                            <input id="pdf_url" name="pdf_url"
+                                class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                type="url" placeholder="https://storage.googleapis.com/...">
+                        </label>
+                    </div>
+                    <div class="mb-4 col-span-1 md:col-span-2">
+                        <label class="block mb-1 text-gray-700">
+                            Thumbnail URL
+                            <input id="thumbnail_url" name="thumbnail_url"
+                                class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                type="url" placeholder="https://storage.googleapis.com/...">
+                        </label>
+                    </div>
                 </div>
 
                 <div class="mb-4">
                     <label class="block mb-1 text-gray-700">
-                        Description
-                        <textarea id="description" name="description" rows="4"
+                        Abstract
+                        <textarea id="abstract" name="abstract" rows="4"
                             class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
                             placeholder="Abstract or summary of publication..."></textarea>
                     </label>
