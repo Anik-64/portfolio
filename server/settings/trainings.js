@@ -44,7 +44,7 @@ trainingsRouter.post('/',
         body('start_date').optional({ nullable: true, checkFalsy: true }).isISO8601(),
         body('end_date').optional({ nullable: true, checkFalsy: true }).isISO8601(),
         body('certificate_url').optional({ nullable: true, checkFalsy: true }).isURL(),
-        body('is_visible').optional({ nullable: true, checkFalsy: true }).isBoolean().toBoolean()
+        body('is_visible').optional({ nullable: true }).isBoolean().toBoolean()
     ],
     async (req, res) => {
         const errors = validationResult(req);
@@ -75,7 +75,7 @@ trainingsRouter.put('/:id',
         body('start_date').optional({ nullable: true, checkFalsy: true }).isISO8601(),
         body('end_date').optional({ nullable: true, checkFalsy: true }).isISO8601(),
         body('certificate_url').optional({ nullable: true, checkFalsy: true }).isURL(),
-        body('is_visible').optional({ nullable: true, checkFalsy: true }).isBoolean().toBoolean()
+        body('is_visible').optional({ nullable: true }).isBoolean().toBoolean()
     ],
     async (req, res) => {
         const errors = validationResult(req);
