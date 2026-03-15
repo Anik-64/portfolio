@@ -99,7 +99,7 @@ CREATE TABLE education (
   is_visible BOOLEAN DEFAULT true
 );
 
--- TRAININGS
+-- TRAININGS (Done)
 CREATE TABLE trainings (
   id SERIAL PRIMARY KEY,
   institute VARCHAR(255) NOT NULL,
