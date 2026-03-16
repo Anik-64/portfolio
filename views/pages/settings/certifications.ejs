@@ -13,27 +13,12 @@
         </div>
     </div>
 
-    <!-- Data Table -->
-    <div class="bg-white shadow-md rounded-lg p-4 md:p-6">
-        <div class="table-container">
-            <div class="table-responsive">
-                <table id="dataTable" class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">ID</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Title</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Issuer</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Issued</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Status</th>
-                            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <!-- Data will be loaded via JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <!-- Data Card Grid -->
+    <div id="cardGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Cards will be loaded via JavaScript -->
+    </div>
+    <div id="noData" class="hidden text-center py-10 bg-white rounded-lg shadow mt-4">
+        <p class="text-gray-500">No certifications found. Click "Add Certification" to create one.</p>
     </div>
 </div>
 
@@ -71,7 +56,7 @@
                             Issued Date
                             <input id="issued_date" name="issued_date"
                                 class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                                type="date">
+                                type="text" placeholder="e.g., January 2023">
                         </label>
                     </div>
                     <div class="mb-4">
@@ -79,7 +64,7 @@
                             Expiry Date
                             <input id="expiry_date" name="expiry_date"
                                 class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                                type="date">
+                                type="text" placeholder="e.g., January 2026">
                         </label>
                     </div>
                     <div class="mb-4">
@@ -99,13 +84,26 @@
                         </label>
                     </div>
                     <div class="mb-4">
-                        <label class="block mb-1 text-gray-700">
-                            PDF URL (File Upload)
-                            <input id="pdf_url" name="pdf_url"
+                        <label class="block mb-1 text-gray-700 font-medium">
+                            Certificate PDF
+                            <input id="pdf_file" name="pdf_file"
                                 class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                                type="url" placeholder="https://example.com/cert.pdf">
+                                type="file" accept=".pdf">
                         </label>
-                        <p class="text-xs text-gray-500 mt-1">Hint: Use the Books (PDF) upload feature to upload PDFs and paste URL here.</p>
+                        <div id="uploadProgressContainer" class="hidden mt-2">
+                             <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                 <div id="uploadProgressBar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                             </div>
+                             <p id="uploadStatus" class="text-xs text-blue-600 mt-1">Uploading...</p>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block mb-1 text-gray-700">
+                            PDF URL
+                            <input id="pdf_url" name="pdf_url"
+                                class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2-blue-500 bg-gray-50" 
+                                type="url" placeholder="URL will appear after upload" readonly>
+                        </label>
                     </div>
                     <div class="mb-4">
                         <label class="block mb-1 text-gray-700">
