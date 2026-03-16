@@ -40,7 +40,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (query) {
             const filtered = originalData.filter(item => 
                 (item.institution || '').toLowerCase().includes(query) || 
-                (item.degree || '').toLowerCase().includes(query)
+                (item.degree || '').toLowerCase().includes(query) ||
+                (item.field_of_study || '').toLowerCase().includes(query)
             );
             renderData(filtered);
         } else {
@@ -50,14 +51,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Handle is_current checkbox to toggle end_date
     document.getElementById('is_current').addEventListener('change', function() {
-        const endDateInput = document.getElementById('end_date');
+        const endYearInput = document.getElementById('end_year');
         if (this.checked) {
-            endDateInput.value = '';
-            endDateInput.disabled = true;
-            endDateInput.classList.add('bg-gray-100');
+            endYearInput.value = '';
+            endYearInput.disabled = true;
+            endYearInput.classList.add('bg-gray-100');
         } else {
-            endDateInput.disabled = false;
-            endDateInput.classList.remove('bg-gray-100');
+            endYearInput.disabled = false;
+            endYearInput.classList.remove('bg-gray-100');
         }
     });
 
@@ -68,23 +69,16 @@ document.addEventListener('DOMContentLoaded', function() {
             institution: document.getElementById('institution').value.trim(),
             degree: document.getElementById('degree').value.trim(),
             field_of_study: document.getElementById('field_of_study').value.trim(),
-            location: document.getElementById('location').value.trim() || null,
-            start_date: document.getElementById('start_date').value || null,
-            end_date: document.getElementById('end_date').value || null,
-            is_current: document.getElementById('is_current').checked,
-            grade: document.getElementById('grade').value.trim() || null,
-            activities: document.getElementById('activities').value.trim() || null,
-            description: document.getElementById('description').value.trim() || null,
+            start_year: document.getElementById('start_year').value.trim() || null,
+            end_year: document.getElementById('end_year').value.trim() || null,
+            cgpa: document.getElementById('cgpa').value.trim() || null,
+            institution_logo_url: document.getElementById('institution_logo_url').value.trim() || null,
             display_order: parseInt(document.getElementById('display_order').value) || 0,
             is_visible: document.getElementById('is_visible').checked
         };
 
-        if (formData.is_current) {
-            formData.end_date = null;
-        }
-
-        if (!formData.institution || !formData.degree || !formData.field_of_study) {
-            showMessage('Institution, Degree, and Field of Study are required', 'error');
+        if (!formData.institution || !formData.degree) {
+            showMessage('Institution and Degree are required', 'error');
             return;
         }
 
@@ -176,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!items || items.length === 0) {
             const row = dataTable.insertRow();
             const cell = row.insertCell(0);
-            cell.colSpan = 6;
+            cell.colSpan = 11;
             cell.textContent = 'No education entries found';
             cell.className = 'text-center py-4 text-black';
             return;
@@ -194,20 +188,37 @@ document.addEventListener('DOMContentLoaded', function() {
             instCell.className = 'px-4 py-2 whitespace-nowrap text-sm font-medium text-black';
             
             const degCell = row.insertCell(2);
-            degCell.textContent = `${item.degree} in ${item.field_of_study}`;
-            degCell.className = 'px-4 py-2 whitespace-normal text-sm text-gray-600';
+            degCell.textContent = item.degree;
+            degCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
+            const fieldCell = row.insertCell(3);
+            fieldCell.textContent = item.field_of_study || 'N/A';
+            fieldCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
 
-            const datesCell = row.insertCell(3);
-            const start = item.start_date ? new Date(item.start_date).toLocaleDateString() : 'N/A';
-            const end = item.is_current ? 'Present' : (item.end_date ? new Date(item.end_date).toLocaleDateString() : 'N/A');
-            datesCell.textContent = `${start} - ${end}`;
-            datesCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
+            const startCell = row.insertCell(4);
+            startCell.textContent = item.start_year || 'N/A';
+            startCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
 
-            const visCell = row.insertCell(4);
+            const endCell = row.insertCell(5);
+            endCell.textContent = item.end_year || 'Present';
+            endCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
+
+            const cgpaCell = row.insertCell(6);
+            cgpaCell.textContent = item.cgpa || 'N/A';
+            cgpaCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
+
+            const logoCell = row.insertCell(7);
+            logoCell.innerHTML = item.institution_logo_url ? `<img src="${item.institution_logo_url}" class="h-8 w-8 object-contain" alt="logo">` : 'N/A';
+            logoCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
+
+            const orderCell = row.insertCell(8);
+            orderCell.textContent = item.display_order;
+            orderCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
+
+            const visCell = row.insertCell(9);
             visCell.innerHTML = item.is_visible ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Yes</span>' : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">No</span>';
             visCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
 
-            const actionsCell = row.insertCell(5);
+            const actionsCell = row.insertCell(10);
             actionsCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-black text-right';
 
             const actionButtons = document.createElement('div');
@@ -262,13 +273,11 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('institution').value = itemData.institution || '';
         document.getElementById('degree').value = itemData.degree || '';
         document.getElementById('field_of_study').value = itemData.field_of_study || '';
-        document.getElementById('location').value = itemData.location || '';
-        document.getElementById('start_date').value = itemData.start_date ? itemData.start_date.split('T')[0] : '';
-        document.getElementById('end_date').value = itemData.end_date ? itemData.end_date.split('T')[0] : '';
-        document.getElementById('is_current').checked = itemData.is_current || false;
-        document.getElementById('grade').value = itemData.grade || '';
-        document.getElementById('activities').value = itemData.activities || '';
-        document.getElementById('description').value = itemData.description || '';
+        document.getElementById('start_year').value = itemData.start_year || '';
+        document.getElementById('end_year').value = itemData.end_year || '';
+        document.getElementById('is_current').checked = !itemData.end_year;
+        document.getElementById('cgpa').value = itemData.cgpa || '';
+        document.getElementById('institution_logo_url').value = itemData.institution_logo_url || '';
         document.getElementById('display_order').value = itemData.display_order || 0;
         document.getElementById('is_visible').checked = itemData.is_visible;
 
