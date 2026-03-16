@@ -4,6 +4,7 @@ const xss = require('xss');
 const he = require('he');
 const { validationResult, body, param } = require('express-validator');
 const pool = require('../../db'); 
+const { logAudit } = require('../utils/auditLogger');
 
 const educationRouter = express.Router();
 
@@ -89,7 +90,11 @@ educationRouter.post('/',
         `;
         try {
             const result = await pool.query(query, [institution, degree, field_of_study, start_year, end_year, cgpa, institution_logo_url, display_order, is_visible]);
-            res.status(201).json({ error: false, message: 'Education created successfully', data: result.rows[0] });
+            const newRecord = result.rows[0];
+            
+            await logAudit(req.user.userno, 'CREATE', 'education', newRecord.id, { institution, degree });
+            
+            res.status(201).json({ error: false, message: 'Education created successfully', data: newRecord });
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: err.detail || 'Internal Server Error' });
@@ -125,6 +130,9 @@ educationRouter.put('/:id',
         try {
             const result = await pool.query(query, [req.params.id, institution, degree, field_of_study, start_year, end_year, cgpa, institution_logo_url, display_order, is_visible]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Education not found!' });
+            
+            await logAudit(req.user.userno, 'UPDATE', 'education', req.params.id, { institution, degree });
+            
             res.status(200).json({ error: false, message: 'Education updated successfully', data: result.rows[0] });
         } catch (err) {
             console.error(err);
@@ -142,6 +150,9 @@ educationRouter.delete('/:id',
         try {
             const result = await pool.query(`DELETE FROM education WHERE id = $1 RETURNING *`, [req.params.id]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Education not found!' });
+            
+            await logAudit(req.user.userno, 'DELETE', 'education', req.params.id, { institution: result.rows[0].institution });
+            
             res.status(200).json({ error: false, message: 'Education deleted successfully', data: result.rows[0] });
         } catch (err) {
             console.error(err);
