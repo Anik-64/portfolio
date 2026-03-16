@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6', // Blue
+                        dark: {
+                            bg: '#0A0A0A',
+                            card: '#141414',
+                            border: '#262626'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'DM Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link rel="stylesheet" href="/css/portfolio.css">
+</head>
+<body class="bg-white dark:bg-dark-bg text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <!-- Grid Dot Background -->
+    <div class="fixed inset-0 z-[-1] pointer-events-none opacity-[0.03] dark:opacity-[0.07]" style="background-image: radial-gradient(#3B82F6 1px, transparent 1px); background-size: 32px 32px;"></div>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-[100] border-b border-transparent transition-all duration-300 backdrop-blur-md">
+        <div class="container mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="#hero" class="text-xl font-bold tracking-tight">Portfolio</a>
+            
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#about" class="nav-link">About</a>
+                <a href="#skills" class="nav-link">Skills</a>
+                <a href="#experience" class="nav-link">Experience</a>
+                <a href="#projects" class="nav-link">Projects</a>
+                <a href="#contact" class="nav-link">Contact</a>
+                
+                <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:block"></i>
+                </button>
+            </div>
+            
+            <button class="md:hidden text-2xl" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="md:hidden hidden absolute top-20 left-0 right-0 bg-white dark:bg-dark-bg border-b border-gray-100 dark:border-dark-border px-6 py-8 flex flex-col space-y-6">
+            <a href="#about" class="mobile-nav-link">About</a>
+            <a href="#skills" class="mobile-nav-link">Skills</a>
+            <a href="#experience" class="mobile-nav-link">Experience</a>
+            <a href="#projects" class="mobile-nav-link">Projects</a>
+            <a href="#contact" class="mobile-nav-link">Contact</a>
+        </div>
+    </nav>
+
+    <main>
+        <section id="hero">
+            <%- include('../partials/portfolio/hero') %>
+        </section>
+        
+        <section id="about" class="section">
+            <%- include('../partials/portfolio/about') %>
+        </section>
+        
+        <section id="skills" class="section">
+            <%- include('../partials/portfolio/skills') %>
+        </section>
+        
+        <section id="experience" class="section">
+            <%- include('../partials/portfolio/experience') %>
+        </section>
+        
+        <section id="projects" class="section">
+            <%- include('../partials/portfolio/projects') %>
+        </section>
+        
+        <div id="secondary-sections">
+            <section id="certifications" class="section">
+                <%- include('../partials/portfolio/certifications') %>
+            </section>
+            
+            <section id="publications" class="section">
+                <%- include('../partials/portfolio/publications') %>
+            </section>
+            
+            <section id="education" class="section">
+                <%- include('../partials/portfolio/education_trainings') %>
+            </section>
+        </div>
+        
+        <section id="contact" class="section">
+            <%- include('../partials/portfolio/contact') %>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <%- include('../partials/portfolio/footer') %>
+
+    <!-- State & Data -->
+    <script>
+        window.PORTFOLIO_STATE = {
+            data: null,
+            theme: localStorage.getItem('theme') || 'dark'
+        };
+    </script>
+    
+    <!-- Scripts -->
+    <script src="/js/portfolio.js"></script>
+</body>
+</html>
