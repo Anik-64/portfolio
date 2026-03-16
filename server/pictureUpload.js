@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require("fs");
 const dotenv = require("dotenv");
+const { logAudit } = require('./utils/auditLogger');
 
 dotenv.config();
 if (!process.env.PROJECT_ID && fs.existsSync("project.env")) {
@@ -98,6 +99,9 @@ profilePicRouter.post('/profile-pic', upload.single('profilePic'), async (req, r
         // const fileOutputName = `${folder}${Date.now()}_${safeName}`;
 
         const publicUrl = await uploadFileToGCS(file, fileOutputName);
+        
+        await logAudit(req.user.userno, 'UPLOAD', 'files', 0, { type: 'profile-pic', url: publicUrl });
+        
         res.status(200).json({ 
             error: false, 
             profilepicurl: publicUrl 
