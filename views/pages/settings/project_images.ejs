@@ -61,13 +61,28 @@
                 </div>
                 
                 <div class="mb-4">
+                    <label class="block mb-1 text-gray-700 font-medium">
+                        Upload Image <span class="text-red-500">*</span>
+                        <input id="image_file" name="image_file"
+                            class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                            type="file" accept=".png,.jpg,.jpeg,.webp">
+                    </label>
+                    <div id="uploadProgressContainer" class="hidden mt-2">
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div id="uploadProgressBar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <p id="uploadStatus" class="text-xs text-blue-600 mt-1">Uploading...</p>
+                    </div>
+                </div>
+
+                <div class="mb-4">
                     <label class="block mb-1 text-gray-700">
                         Image URL <span class="text-red-500">*</span>
                         <input id="image_url" name="image_url" required
-                            class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                            type="url" placeholder="https://example.com/image.png">
+                            class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50" 
+                            type="url" placeholder="URL will appear after upload, or paste directly">
                     </label>
-                    <p class="text-xs text-gray-500 mt-1">Hint: You can upload a picture via the User profile/picture upload and paste the URL here.</p>
+                    <p class="text-xs text-gray-500 mt-1">Upload an image above, or paste a URL directly.</p>
                 </div>
 
                 <div class="mb-4">
