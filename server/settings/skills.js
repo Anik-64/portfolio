@@ -1,6 +1,7 @@
 const express = require('express');
 const { commonMiddlewares, createRateLimiter } = require('../../auth/middleware/commonMiddleware');
 const xss = require('xss');
+const he = require('he');
 const { validationResult, body, param } = require('express-validator');
 const pool = require('../../db'); 
 
@@ -18,10 +19,24 @@ skillsRouter.get('/', async (req, res) => {
         if (result.rowCount === 0) {
             return res.status(404).json({ error: true, message: "No data found!" });
         }
-        res.status(200).json({ error: false, data: result.rows });
+
+        const formattedData = result.rows.map((row) => {
+            return {
+                ...row,
+                category: row.category ? he.decode(row.category) : null,
+            };
+        });
+        
+        res.status(200).json({ 
+            error: false, 
+            data: formattedData 
+        });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ 
+            error: true, 
+            message: 'Internal Server Error' 
+        });
     }
 });
 
@@ -37,10 +52,24 @@ skillsRouter.get('/:id',
         try {
             const result = await pool.query(`SELECT * FROM skills WHERE id = $1`, [req.params.id]);
             if(result.rowCount === 0) return res.status(404).json({ error: true, message: 'No data found!' });
-            res.status(200).json({ error: false, data: result.rows[0] });
+
+            const formattedData = result.rows.map((row) => {
+                return {
+                    ...row,
+                    category: row.category ? he.decode(row.category) : null,
+                };
+            });
+
+            res.status(200).json({ 
+                error: false, 
+                data: formattedData[0] 
+            });
         } catch (err) {
             console.error(err);
-            res.status(500).json({ error: 'Internal Server Error' });
+            res.status(500).json({ 
+                error: true, 
+                message: 'Internal Server Error' 
+            });
         }
     }
 );
@@ -67,10 +96,17 @@ skillsRouter.post('/',
         `;
         try {
             const result = await pool.query(query, [category, name, icon_slug, display_order, is_visible]);
-            res.status(201).json({ error: false, message: 'Skill created successfully', data: result.rows[0] });
+            res.status(201).json({ 
+                error: false, 
+                message: 'Skill created successfully', 
+                data: result.rows[0] 
+            });
         } catch (err) {
             console.error(err);
-            res.status(500).json({ error: err.detail || 'Internal Server Error' });
+            res.status(500).json({ 
+                error: true, 
+                message: 'Internal Server Error' 
+            });
         }
     }
 );
@@ -100,10 +136,17 @@ skillsRouter.put('/:id',
         try {
             const result = await pool.query(query, [req.params.id, category, name, icon_slug, display_order, is_visible]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Skill not found!' });
-            res.status(200).json({ error: false, message: 'Skill updated successfully', data: result.rows[0] });
+            res.status(200).json({ 
+                error: false, 
+                message: 'Skill updated successfully', 
+                data: result.rows[0] 
+            });
         } catch (err) {
             console.error(err);
-            res.status(500).json({ error: err.detail || 'Internal Server Error' });
+            res.status(500).json({ 
+                error: true, 
+                message: 'Internal Server Error' 
+            });
         }
     }
 );
@@ -118,10 +161,17 @@ skillsRouter.delete('/:id',
         try {
             const result = await pool.query(`DELETE FROM skills WHERE id = $1 RETURNING *`, [req.params.id]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Skill not found!' });
-            res.status(200).json({ error: false, message: 'Skill deleted successfully', data: result.rows[0] });
+            res.status(200).json({ 
+                error: false, 
+                message: 'Skill deleted successfully', 
+                data: result.rows[0] 
+            });
         } catch (err) {
             console.error(err);
-            res.status(500).json({ error: err.detail || 'Internal Server Error' });
+            res.status(500).json({ 
+                error: true, 
+                message: 'Internal Server Error' 
+            });
         }
     }
 );
