@@ -55,8 +55,8 @@ CREATE TABLE certifications (
   id SERIAL PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
   issuer VARCHAR(255) NOT NULL,
-  issued_date DATE,
-  expiry_date DATE,
+  issued_date VARCHAR(20),                     -- e.g. "January 2023"
+  expiry_date VARCHAR(20),                     -- e.g. "January 2026"
   credential_id VARCHAR(255),
   credential_url TEXT,
   pdf_url TEXT,                                -- GCS PDF URL
