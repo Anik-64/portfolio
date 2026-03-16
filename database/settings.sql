@@ -85,7 +85,7 @@ CREATE TABLE publications (
 );
 -- ALTER TABLE publications ADD COLUMN author_linkedin_urls TEXT[];
 
--- EDUCATION
+-- EDUCATION (Done)
 CREATE TABLE education (
   id SERIAL PRIMARY KEY,
   institution VARCHAR(255) NOT NULL,
