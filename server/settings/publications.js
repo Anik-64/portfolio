@@ -1,6 +1,7 @@
 const express = require('express');
 const { commonMiddlewares, createRateLimiter } = require('../../auth/middleware/commonMiddleware');
 const xss = require('xss');
+const he = require('he');
 const { validationResult, body, param } = require('express-validator');
 const pool = require('../../db'); 
 
@@ -13,10 +14,24 @@ publicationsRouter.get('/', async (req, res) => {
     try {
         const result = await pool.query(`SELECT * FROM publications ORDER BY published_date DESC, id DESC`);
         if (result.rowCount === 0) return res.status(404).json({ error: true, message: "No data found!" });
-        res.status(200).json({ error: false, data: result.rows });
+
+        const formattedData = result.rows.map((row) => {
+            return {
+                ...row,
+                doi: row.doi ? he.decode(row.doi) : null,
+            };
+        });
+        
+        res.status(200).json({ 
+            error: false, 
+            data: formattedData
+        });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ 
+            error: true, 
+            message: 'Internal Server Error' 
+        });
     }
 });
 
@@ -29,10 +44,24 @@ publicationsRouter.get('/:id',
         try {
             const result = await pool.query(`SELECT * FROM publications WHERE id = $1`, [req.params.id]);
             if(result.rowCount === 0) return res.status(404).json({ error: true, message: 'No data found!' });
-            res.status(200).json({ error: false, data: result.rows[0] });
+
+            const formattedData = result.rows.map((row) => {
+                return {
+                    ...row,
+                    doi: row.doi ? he.decode(row.doi) : null,
+                };
+            });
+
+            res.status(200).json({ 
+                error: false, 
+                data: formattedData[0] 
+            });
         } catch (err) {
             console.error(err);
-            res.status(500).json({ error: 'Internal Server Error' });
+            res.status(500).json({ 
+                error: true, 
+                message: 'Internal Server Error' 
+            });
         }
     }
 );
@@ -65,10 +94,17 @@ publicationsRouter.post('/',
         `;
         try {
             const result = await pool.query(query, [title, journal_name, publisher, authors, author_linkedin_urls, abstract?xss(abstract):null, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible]);
-            res.status(201).json({ error: false, message: 'Publication created successfully', data: result.rows[0] });
+            res.status(201).json({ 
+                error: false, 
+                message: 'Publication created successfully', 
+                data: result.rows[0] 
+            });
         } catch (err) {
             console.error(err);
-            res.status(500).json({ error: err.detail || 'Internal Server Error' });
+            res.status(500).json({ 
+                error: true, 
+                message: 'Internal Server Error' 
+            });
         }
     }
 );
@@ -104,10 +140,17 @@ publicationsRouter.put('/:id',
         try {
             const result = await pool.query(query, [req.params.id, title, journal_name, publisher, authors, author_linkedin_urls, abstract?xss(abstract):null, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Publication not found!' });
-            res.status(200).json({ error: false, message: 'Publication updated successfully', data: result.rows[0] });
+            res.status(200).json({ 
+                error: false, 
+                message: 'Publication updated successfully', 
+                data: result.rows[0] 
+            });
         } catch (err) {
             console.error(err);
-            res.status(500).json({ error: err.detail || 'Internal Server Error' });
+            res.status(500).json({ 
+                error: true, 
+                message: 'Internal Server Error' 
+            });
         }
     }
 );
@@ -121,10 +164,17 @@ publicationsRouter.delete('/:id',
         try {
             const result = await pool.query(`DELETE FROM publications WHERE id = $1 RETURNING *`, [req.params.id]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Publication not found!' });
-            res.status(200).json({ error: false, message: 'Publication deleted successfully', data: result.rows[0] });
+            res.status(200).json({ 
+                error: false, 
+                message: 'Publication deleted successfully', 
+                data: result.rows[0] 
+            });
         } catch (err) {
             console.error(err);
-            res.status(500).json({ error: err.detail || 'Internal Server Error' });
+            res.status(500).json({ 
+                error: true, 
+                message: 'Internal Server Error' 
+            });
         }
     }
 );
