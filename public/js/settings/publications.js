@@ -192,11 +192,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderCardView(items, container) {
-        let cardsHtml = '<div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-2">';
+        let cardsHtml = '<div class="grid grid-cols-1 gap-6 p-2">';
         
         items.forEach(item => {
-            // Fix: Use UTC to avoid timezone shifts for DATE columns
-            const dateStr = item.published_date ? new Date(item.published_date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' }) : 'N/A';
+            const dateStr = item.published_date 
+                ? new Date(item.published_date).toLocaleDateString('en-BD', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    timeZone: 'Asia/Dhaka'
+                    })
+                : 'N/A';
             const thumbUrl = item.thumbnail_url || 'https://via.placeholder.com/150x200?text=No+Cover';
             const authorsHtml = renderAuthors(item);
             
