@@ -1,0 +1,45 @@
+<div class="container mx-auto px-6">
+    <div class="flex flex-col lg:flex-row gap-16 items-center">
+        <!-- Photo Column -->
+        <div class="w-full lg:w-5/12">
+            <div class="relative group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-primary to-blue-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                <div class="relative aspect-square rounded-2xl overflow-hidden border border-gray-100 dark:border-dark-border bg-white dark:bg-dark-card">
+                    <img id="aboutImage" src="https://via.placeholder.com/600x600?text=Profile+Image" alt="Profile" class="w-full h-full object-cover">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Content Column -->
+        <div class="w-full lg:w-7/12">
+            <h2 class="text-3xl font-bold mb-6 flex items-center">
+                <span class="w-8 h-1 bg-primary mr-4"></span>
+                About Me
+            </h2>
+            
+            <p id="aboutBio" class="text-lg text-gray-600 dark:text-gray-400 mb-10 leading-relaxed">
+                Loading bio...
+            </p>
+            
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="p-6 card-glass text-center">
+                    <div id="statYears" class="text-2xl font-bold text-primary mb-1">0</div>
+                    <div class="text-xs text-gray-500 uppercase tracking-widest font-semibold">Experience</div>
+                </div>
+                <div class="p-6 card-glass text-center">
+                    <div id="statProjects" class="text-2xl font-bold text-primary mb-1">0</div>
+                    <div class="text-xs text-gray-500 uppercase tracking-widest font-semibold">Projects</div>
+                </div>
+                <div class="p-6 card-glass text-center">
+                    <div id="statCerts" class="text-2xl font-bold text-primary mb-1">0</div>
+                    <div class="text-xs text-gray-500 uppercase tracking-widest font-semibold">Certifications</div>
+                </div>
+                <div class="p-6 card-glass text-center">
+                    <div id="statPapers" class="text-2xl font-bold text-primary mb-1">0</div>
+                    <div class="text-xs text-gray-500 uppercase tracking-widest font-semibold">Papers</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
