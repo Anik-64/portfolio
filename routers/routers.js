@@ -1,7 +1,6 @@
 // ALL Routers 
 module.exports = {
     profilePicRouter: require('../server/pictureUpload'),
-    currencyRouter: require('../server/currency/currency'),
     bookUploadRouter: require('../server/bookUpload').bookUploadRouter,
     skillsRouter: require('../server/settings/skills'),
     experiencesRouter: require('../server/settings/experiences'),
