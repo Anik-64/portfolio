@@ -3,6 +3,7 @@ const { commonMiddlewares, createRateLimiter } = require('../auth/middleware/com
 const xss = require('xss');
 const { validationResult, body, param } = require('express-validator');
 const pool = require('../db'); 
+const { logAudit } = require('./utils/auditLogger');
 
 const profileRouter = express.Router();
 
@@ -55,7 +56,8 @@ profileRouter.put('/',
         `;
         try {
             const result = await pool.query(query, [peopleno, firstname, lastname, tagline, bio, profilepicurl, resume_url, years_of_experience]);
-            if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Profile not found!' });
+            await logAudit(req.user.userno, 'UPDATE', 'gen_peopleprimary', peopleno, { firstname, lastname });
+            
             res.status(200).json({ error: false, message: 'Profile updated successfully', data: result.rows[0] });
         } catch (err) {
             console.error(err);
@@ -116,7 +118,10 @@ profileRouter.post('/contacts',
         `;
         try {
             const result = await pool.query(query, [peopleno, contacttypeno, contact, contactprefix, usenote]);
-            res.status(201).json({ error: false, message: 'Contact added successfully', data: result.rows[0] });
+            const newRecord = result.rows[0];
+            await logAudit(req.user.userno, 'CREATE', 'gen_peoplecontact', newRecord.id, { contact });
+            
+            res.status(201).json({ error: false, message: 'Contact added successfully', data: newRecord });
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Internal Server Error' });
@@ -149,6 +154,9 @@ profileRouter.put('/contacts/:id',
         try {
             const result = await pool.query(query, [req.params.id, peopleno, contacttypeno, contact, contactprefix, usenote]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Contact not found!' });
+            
+            await logAudit(req.user.userno, 'UPDATE', 'gen_peoplecontact', req.params.id, { contact });
+            
             res.status(200).json({ error: false, message: 'Contact updated successfully', data: result.rows[0] });
         } catch (err) {
             console.error(err);
@@ -168,6 +176,9 @@ profileRouter.delete('/contacts/:id',
         try {
             const result = await pool.query(`DELETE FROM gen_peoplecontact WHERE id = $1 AND peopleno = $2 RETURNING *`, [req.params.id, peopleno]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Contact not found!' });
+            
+            await logAudit(req.user.userno, 'DELETE', 'gen_peoplecontact', req.params.id, { contact: result.rows[0].contact });
+            
             res.status(200).json({ error: false, message: 'Contact deleted successfully' });
         } catch (err) {
             console.error(err);
