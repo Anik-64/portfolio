@@ -12,5 +12,6 @@ module.exports = {
     trainingsRouter: require('../server/settings/trainings'),
     contactMessagesRouter: require('../server/settings/contact_messages'),
     auditLogRouter: require('../server/settings/audit_log'),
-    profileRouter: require('../server/profile')
+    profileRouter: require('../server/profile'),
+    portfolioPublicRouter: require('../server/portfolio_public')
 };
