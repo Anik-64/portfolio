@@ -3,6 +3,7 @@ const { commonMiddlewares, createRateLimiter } = require('../../auth/middleware/
 const xss = require('xss');
 const { validationResult, body, param } = require('express-validator');
 const pool = require('../../db'); 
+const { logAudit } = require('../utils/auditLogger');
 
 const trainingsRouter = express.Router();
 
@@ -59,7 +60,11 @@ trainingsRouter.post('/',
         `;
         try {
             const result = await pool.query(query, [institute, program_name, start_date, end_date, certificate_url, is_visible]);
-            res.status(201).json({ error: false, message: 'Training created successfully', data: result.rows[0] });
+            const newRecord = result.rows[0];
+            
+            await logAudit(req.user.userno, 'CREATE', 'trainings', newRecord.id, { institute, program_name });
+            
+            res.status(201).json({ error: false, message: 'Training created successfully', data: newRecord });
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: err.detail || 'Internal Server Error' });
@@ -92,6 +97,9 @@ trainingsRouter.put('/:id',
         try {
             const result = await pool.query(query, [req.params.id, institute, program_name, start_date, end_date, certificate_url, is_visible]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Training not found!' });
+            
+            await logAudit(req.user.userno, 'UPDATE', 'trainings', req.params.id, { institute, program_name });
+            
             res.status(200).json({ error: false, message: 'Training updated successfully', data: result.rows[0] });
         } catch (err) {
             console.error(err);
@@ -109,6 +117,9 @@ trainingsRouter.delete('/:id',
         try {
             const result = await pool.query(`DELETE FROM trainings WHERE id = $1 RETURNING *`, [req.params.id]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Training not found!' });
+            
+            await logAudit(req.user.userno, 'DELETE', 'trainings', req.params.id, { institute: result.rows[0].institute, program_name: result.rows[0].program_name });
+            
             res.status(200).json({ error: false, message: 'Training deleted successfully', data: result.rows[0] });
         } catch (err) {
             console.error(err);
