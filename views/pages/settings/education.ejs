@@ -23,7 +23,12 @@
                             <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">ID</th>
                             <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Institution</th>
                             <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Degree</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Dates</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Field of Study</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Start Year</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">End Year</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">CGPA</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Logo URL</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Order</th>
                             <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Visible</th>
                             <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider">Actions</th>
                         </tr>
@@ -76,54 +81,44 @@
                     </div>
                     <div class="mb-4">
                         <label class="block mb-1 text-gray-700">
-                            Location
-                            <input id="location" name="location"
+                            Start Year <span class="text-red-500">*</span>
+                            <input id="start_year" name="start_year" required
                                 class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                                type="text" placeholder="e.g., New York, NY">
+                                type="text" placeholder="e.g., 2018">
                         </label>
                     </div>
                     <div class="mb-4">
                         <label class="block mb-1 text-gray-700">
-                            Start Date <span class="text-red-500">*</span>
-                            <input id="start_date" name="start_date" required
+                            End Year
+                            <input id="end_year" name="end_year"
                                 class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                                type="date">
+                                type="text" placeholder="e.g., 2022 (Leave empty if current)">
                         </label>
                     </div>
                     <div class="mb-4">
                         <label class="block mb-1 text-gray-700">
-                            End Date
-                            <input id="end_date" name="end_date"
-                                class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                                type="date">
-                        </label>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block mb-1 text-gray-700">
-                            Grade / GPA
-                            <input id="grade" name="grade"
+                            Grade / CGPA
+                            <input id="cgpa" name="cgpa"
                                 class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
                                 type="text" placeholder="e.g., 3.8/4.0">
                         </label>
                     </div>
-                </div>
-
-                <div class="mb-4">
-                    <label class="block mb-1 text-gray-700">
-                        Activities and Societies
-                        <textarea id="activities" name="activities" rows="3"
-                            class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                            placeholder="e.g., Computer Science Club, Hackathon Team..."></textarea>
-                    </label>
-                </div>
-
-                <div class="mb-4">
-                    <label class="block mb-1 text-gray-700">
-                        Description
-                        <textarea id="description" name="description" rows="3"
-                            class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                            placeholder="Overall experience, relevant coursework..."></textarea>
-                    </label>
+                    <div class="mb-4">
+                        <label class="block mb-1 text-gray-700">
+                            Institution Logo URL (GCS)
+                            <input id="institution_logo_url" name="institution_logo_url"
+                                class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                type="text" placeholder="https://storage.googleapis.com/...">
+                        </label>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block mb-1 text-gray-700">
+                            Display Order
+                            <input id="display_order" name="display_order"
+                                class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                type="number" value="0">
+                        </label>
+                    </div>
                 </div>
 
                 <div class="mb-4 flex space-x-6">
@@ -134,15 +129,6 @@
                     <label class="flex items-center text-gray-700">
                         <input id="is_visible" name="is_visible" type="checkbox" class="mr-2" checked>
                         Is Visible
-                    </label>
-                </div>
-
-                <div class="mb-4 w-1/2">
-                    <label class="block mb-1 text-gray-700">
-                        Display Order
-                        <input id="display_order" name="display_order"
-                            class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                            type="number" value="0">
                     </label>
                 </div>
                 
