@@ -1,0 +1,131 @@
+/* Portfolio Custom Styles */
+
+:root {
+    --accent: #3B82F6;
+    --transition: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Base Styles */
+body {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+/* Section Spacing */
+.section {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s var(--transition), transform 0.8s var(--transition);
+}
+
+.section.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Navigation Links */
+.nav-link {
+    @apply text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors;
+    position: relative;
+}
+
+.nav-link.active {
+    @apply text-primary font-bold;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--accent);
+    transition: width 0.3s var(--transition);
+}
+
+.nav-link.active::after {
+    width: 100%;
+}
+
+.mobile-nav-link {
+    @apply text-lg font-semibold text-gray-900 dark:text-white;
+}
+
+/* Cards & Components */
+.card-glass {
+    @apply bg-white/50 dark:bg-dark-card/50 backdrop-blur-sm border border-gray-100 dark:border-dark-border rounded-xl transition-all duration-300;
+}
+
+.card-glass:hover {
+    @apply border-primary/50 shadow-lg shadow-primary/5;
+    transform: scale(1.01);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.8s var(--transition) forwards;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.8s var(--transition) forwards;
+}
+
+/* Tag Pills */
+.tag-pill {
+    @apply px-3 py-1 text-xs font-medium rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-100 dark:border-blue-800/50 hover:glow transition-all;
+}
+
+.hover\:glow:hover {
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-gray-200 dark:bg-gray-800 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-300 dark:bg-gray-700;
+}
+
+/* Navbar Scrolled State */
+nav.scrolled {
+    @apply bg-white/80 dark:bg-dark-bg/80 border-gray-100 dark:border-dark-border h-16;
+}
+
+/* Typing Caret */
+.caret {
+    display: inline-block;
+    width: 2px;
+    height: 1.2em;
+    background-color: var(--accent);
+    margin-left: 2px;
+    vertical-align: middle;
+    animation: blink 0.8s step-end infinite;
+}
+
+@keyframes blink {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
+}
