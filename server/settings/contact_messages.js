@@ -3,6 +3,7 @@ const { commonMiddlewares, createRateLimiter } = require('../../auth/middleware/
 const xss = require('xss');
 const { validationResult, body, param } = require('express-validator');
 const pool = require('../../db'); 
+const { logAudit } = require('../utils/auditLogger');
 
 const contactMessagesRouter = express.Router();
 
@@ -85,6 +86,9 @@ contactMessagesRouter.put('/:id',
         try {
             const result = await pool.query(query, [req.params.id, is_read]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Message not found!' });
+            
+            await logAudit(req.user.userno, 'UPDATE', 'contact_messages', req.params.id, { sender_name: result.rows[0].sender_name, is_read });
+            
             res.status(200).json({ error: false, message: 'Message updated successfully', data: result.rows[0] });
         } catch (err) {
             console.error(err);
@@ -102,6 +106,9 @@ contactMessagesRouter.delete('/:id',
         try {
             const result = await pool.query(`DELETE FROM contact_messages WHERE id = $1 RETURNING *`, [req.params.id]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Message not found!' });
+            
+            await logAudit(req.user.userno, 'DELETE', 'contact_messages', req.params.id, { sender_name: result.rows[0].sender_name, subject: result.rows[0].subject });
+            
             res.status(200).json({ error: false, message: 'Message deleted successfully', data: result.rows[0] });
         } catch (err) {
             console.error(err);
