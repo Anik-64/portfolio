@@ -23,6 +23,10 @@ const decodeData = (data) => {
     if (Array.isArray(data)) {
         return data.map(item => decodeData(item));
     }
+    // If it's a Date object, return it as is (or it becomes an empty {} during iteration)
+    if (data instanceof Date) {
+        return data;
+    }
     if (typeof data === 'object' && data !== null) {
         const decodedObj = {};
         for (const key in data) {
