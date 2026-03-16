@@ -112,15 +112,6 @@ app.get('/dashboard', authenticateRender, (req, res) => {
         // cache: true,
     });
 });
-app.get('/currency', authenticateRender, (req, res) => {
-    res.render('pages/currency', {
-        layout: 'layout',
-        title: 'Currency Settings',
-        currentPath: 'currency',
-        customJS: '/js/currency.js',
-        // cache: true,
-    });
-});
 
 // Settings Frontend Routes
 app.get('/settings/skills', authenticateRender, (req, res) => {
@@ -217,12 +208,6 @@ app.get('/profile', authenticateRender, (req, res) => {
 app.use('/api/v1/signup', signup);
 app.use('/api/v1/login', login);
 app.use('/api/v1/refresh-token', authenticateToken, refreshToken);
-
-app.use(
-    '/api/v1/currency',
-    authenticateToken,
-    routers.currencyRouter
-);
 
 app.use(
     '/api/v1/settings/skills', 
