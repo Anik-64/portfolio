@@ -4,6 +4,7 @@ const xss = require('xss');
 const he = require('he');
 const { validationResult, body, param } = require('express-validator');
 const pool = require('../../db'); 
+const { logAudit } = require('../utils/auditLogger');
 
 const publicationsRouter = express.Router();
 
@@ -94,10 +95,14 @@ publicationsRouter.post('/',
         `;
         try {
             const result = await pool.query(query, [title, journal_name, publisher, authors, author_linkedin_urls, abstract?xss(abstract):null, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible]);
+            const newRecord = result.rows[0];
+            
+            await logAudit(req.user.userno, 'CREATE', 'publications', newRecord.id, { title });
+            
             res.status(201).json({ 
                 error: false, 
                 message: 'Publication created successfully', 
-                data: result.rows[0] 
+                data: newRecord 
             });
         } catch (err) {
             console.error(err);
@@ -140,6 +145,9 @@ publicationsRouter.put('/:id',
         try {
             const result = await pool.query(query, [req.params.id, title, journal_name, publisher, authors, author_linkedin_urls, abstract?xss(abstract):null, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Publication not found!' });
+            
+            await logAudit(req.user.userno, 'UPDATE', 'publications', req.params.id, { title });
+            
             res.status(200).json({ 
                 error: false, 
                 message: 'Publication updated successfully', 
@@ -164,6 +172,9 @@ publicationsRouter.delete('/:id',
         try {
             const result = await pool.query(`DELETE FROM publications WHERE id = $1 RETURNING *`, [req.params.id]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Publication not found!' });
+            
+            await logAudit(req.user.userno, 'DELETE', 'publications', req.params.id, { title: result.rows[0].title });
+            
             res.status(200).json({ 
                 error: false, 
                 message: 'Publication deleted successfully', 
