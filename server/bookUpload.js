@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require("fs");
 const dotenv = require("dotenv");
+const { logAudit } = require('./utils/auditLogger');
 
 dotenv.config();
 if (!process.env.PROJECT_ID && fs.existsSync("project.env")) {
@@ -118,6 +119,8 @@ bookUploadRouter.post('/file', upload.single('bookFile'), async (req, res) => {
         const fileOutputName = `${folder}${Date.now()}_${safeName}`;
         const publicUrl = await uploadFileToGCS(file, fileOutputName);
 
+        await logAudit(req.user.userno, 'UPLOAD', 'files', 0, { type: 'book-file', url: publicUrl });
+
         res.status(200).json({
             error: false,
             message: 'File uploaded successfully',
@@ -151,6 +154,8 @@ bookUploadRouter.post('/cover', upload.single('coverImage'), async (req, res) =>
         const fileOutputName = `books/covers/${Date.now()}_${safeName}`;
 
         const publicUrl = await uploadFileToGCS(file, fileOutputName);
+
+        await logAudit(req.user.userno, 'UPLOAD', 'files', 0, { type: 'book-cover', url: publicUrl });
 
         res.status(200).json({
             error: false,
