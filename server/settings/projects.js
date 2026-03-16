@@ -1,6 +1,7 @@
 const express = require('express');
 const { commonMiddlewares, createRateLimiter } = require('../../auth/middleware/commonMiddleware');
 const xss = require('xss');
+const he = require('he');
 const { validationResult, body, param } = require('express-validator');
 const pool = require('../../db'); 
 const { logAudit } = require('../utils/auditLogger');
@@ -14,15 +15,28 @@ projectsRouter.get('/', async (req, res) => {
     try {
         const result = await pool.query(`SELECT * FROM projects ORDER BY display_order ASC, created_at DESC`);
         if (result.rowCount === 0) return res.status(404).json({ error: true, message: "No data found!" });
-        res.status(200).json({ error: false, data: result.rows });
+        result.rows.forEach(row => {
+            row.title = he.decode(row.title);
+            row.short_description = he.decode(row.short_description);
+            row.long_description = he.decode(row.long_description);
+        });
+        res.status(200).json({ 
+            error: false, 
+            data: result.rows 
+        });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+        res.status(500).json({ 
+            error: true, 
+            message: 'Internal Server Error' 
+        });
+    }   
 });
 
 projectsRouter.get('/:id',
-    [ param('id').isInt().toInt() ],
+    [ 
+        param('id').isInt().toInt() 
+    ],
     async (req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) return res.status(400).json({ error: true, message: errors.array()[0].msg });
@@ -30,10 +44,21 @@ projectsRouter.get('/:id',
         try {
             const result = await pool.query(`SELECT * FROM projects WHERE id = $1`, [req.params.id]);
             if(result.rowCount === 0) return res.status(404).json({ error: true, message: 'No data found!' });
-            res.status(200).json({ error: false, data: result.rows[0] });
+            result.rows.forEach(row => {
+                row.title = he.decode(row.title);
+                row.short_description = he.decode(row.short_description);
+                row.long_description = he.decode(row.long_description);
+            });
+            res.status(200).json({ 
+                error: false, 
+                data: result.rows[0] 
+            });
         } catch (err) {
             console.error(err);
-            res.status(500).json({ error: 'Internal Server Error' });
+            res.status(500).json({ 
+                error: true, 
+                message: 'Internal Server Error' 
+            });
         }
     }
 );
@@ -70,10 +95,17 @@ projectsRouter.post('/',
             
             await logAudit(req.user.userno, 'CREATE', 'projects', newRecord.id, { title });
             
-            res.status(201).json({ error: false, message: 'Project created successfully', data: newRecord });
+            res.status(201).json({ 
+                error: false, 
+                message: 'Project created successfully', 
+                data: newRecord 
+            });
         } catch (err) {
             console.error(err);
-            res.status(500).json({ error: err.detail || 'Internal Server Error' });
+            res.status(500).json({ 
+                error: true, 
+                message: 'Internal Server Error' 
+            });
         }
     }
 );
@@ -112,10 +144,17 @@ projectsRouter.put('/:id',
             
             await logAudit(req.user.userno, 'UPDATE', 'projects', req.params.id, { title });
             
-            res.status(200).json({ error: false, message: 'Project updated successfully', data: result.rows[0] });
+            res.status(200).json({ 
+                error: false, 
+                message: 'Project updated successfully', 
+                data: result.rows[0] 
+            });
         } catch (err) {
             console.error(err);
-            res.status(500).json({ error: err.detail || 'Internal Server Error' });
+            res.status(500).json({ 
+                error: true, 
+                message: 'Internal Server Error' 
+            });
         }
     }
 );
@@ -132,10 +171,17 @@ projectsRouter.delete('/:id',
             
             await logAudit(req.user.userno, 'DELETE', 'projects', req.params.id, { title: result.rows[0].title });
             
-            res.status(200).json({ error: false, message: 'Project deleted successfully', data: result.rows[0] });
+            res.status(200).json({ 
+                error: false, 
+                message: 'Project deleted successfully', 
+                data: result.rows[0] 
+            });
         } catch (err) {
             console.error(err);
-            res.status(500).json({ error: err.detail || 'Internal Server Error' });
+            res.status(500).json({ 
+                error: true, 
+                message: 'Internal Server Error' 
+            });
         }
     }
 );
