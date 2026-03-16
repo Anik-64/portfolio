@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const dataTable = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+    const cardGrid = document.getElementById('cardGrid');
+    const noData = document.getElementById('noData');
     const addBtn = document.getElementById('addBtn');
     const dataModal = document.getElementById('dataModal');
     const deleteModal = document.getElementById('deleteModal');
@@ -11,6 +12,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalTitle = document.getElementById('modalTitle');
     const floatingMessage = document.getElementById('floatingMessage');
     const searchInput = document.getElementById('searchInput');
+    const pdfFile = document.getElementById('pdf_file');
+    const pdfUrlInput = document.getElementById('pdf_url');
+    const uploadProgressContainer = document.getElementById('uploadProgressContainer');
+    const uploadProgressBar = document.getElementById('uploadProgressBar');
+    const uploadStatus = document.getElementById('uploadStatus');
 
     let originalData = [];
     let currentId = null;
@@ -25,6 +31,8 @@ document.addEventListener('DOMContentLoaded', function() {
         currentId = null;
         modalTitle.textContent = 'Add Certification';
         dataForm.reset();
+        pdfFile.value = ''; // Reset file input
+        uploadProgressContainer.classList.add('hidden');
         document.getElementById('is_visible').checked = true;
         document.getElementById('status').value = 'active';
         document.getElementById('display_order').value = 0;
@@ -48,34 +56,109 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 500));
 
-    dataForm.addEventListener('submit', function(e) {
+    dataForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        const formData = {
-            title: document.getElementById('titleStr').value.trim(),
-            issuer: document.getElementById('issuer').value.trim(),
-            issued_date: document.getElementById('issued_date').value || null,
-            expiry_date: document.getElementById('expiry_date').value || null,
-            credential_id: document.getElementById('credential_id').value.trim() || null,
-            credential_url: document.getElementById('credential_url').value.trim() || null,
-            pdf_url: document.getElementById('pdf_url').value.trim() || null,
-            badge_image_url: document.getElementById('badge_image_url').value.trim() || null,
-            status: document.getElementById('status').value.trim() || 'active',
-            display_order: parseInt(document.getElementById('display_order').value) || 0,
-            is_visible: document.getElementById('is_visible').checked
-        };
+        const saveBtn = dataForm.querySelector('button[type="submit"]');
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Saving...';
 
-        if (!formData.title || !formData.issuer) {
-            showMessage('Title and Issuer are required', 'error');
-            return;
-        }
+        try {
+            // Check for file upload first
+            if (pdfFile.files.length > 0) {
+                const uploadedUrl = await uploadPdfFile(pdfFile.files[0]);
+                if (!uploadedUrl) {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Save';
+                    return;
+                }
+                pdfUrlInput.value = uploadedUrl;
+            }
 
-        if (currentId) {
-            updateData(currentId, formData);
-        } else {
-            createData(formData);
+            const formData = {
+                title: document.getElementById('titleStr').value.trim(),
+                issuer: document.getElementById('issuer').value.trim(),
+                issued_date: document.getElementById('issued_date').value || null,
+                expiry_date: document.getElementById('expiry_date').value || null,
+                credential_id: document.getElementById('credential_id').value.trim() || null,
+                credential_url: document.getElementById('credential_url').value.trim() || null,
+                pdf_url: pdfUrlInput.value.trim() || null,
+                badge_image_url: document.getElementById('badge_image_url').value.trim() || null,
+                status: document.getElementById('status').value.trim() || 'active',
+                display_order: parseInt(document.getElementById('display_order').value) || 0,
+                is_visible: document.getElementById('is_visible').checked
+            };
+
+            if (!formData.title || !formData.issuer) {
+                showMessage('Title and Issuer are required', 'error');
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save';
+                return;
+            }
+
+            if (currentId) {
+                await updateData(currentId, formData);
+            } else {
+                await createData(formData);
+            }
+        } catch (err) {
+            console.error(err);
+            showMessage('Error during save', 'error');
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save';
         }
     });
+
+    async function uploadPdfFile(file) {
+        uploadProgressContainer.classList.remove('hidden');
+        uploadProgressBar.style.width = '0%';
+        uploadStatus.textContent = 'Uploading...';
+
+        const formData = new FormData();
+        formData.append('bookFile', file);
+
+        const accessToken = localStorage.getItem('accessToken');
+        
+        try {
+            const xhr = new XMLHttpRequest();
+            const promise = new Promise((resolve, reject) => {
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percent = (e.loaded / e.total) * 100;
+                        uploadProgressBar.style.width = percent + '%';
+                    }
+                });
+
+                xhr.onreadystatechange = () => {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            const response = JSON.parse(xhr.responseText);
+                            resolve(response.data.url);
+                        } else {
+                            reject(new Error('Upload failed'));
+                        }
+                    }
+                };
+            });
+
+            xhr.open('POST', '/api/v1/upload/book/file', true);
+            xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+            xhr.send(formData);
+
+            const url = await promise;
+            uploadStatus.textContent = 'Upload complete!';
+            return url;
+        } catch (err) {
+            console.error('Upload error:', err);
+            showMessage('PDF Upload failed', 'error');
+            return null;
+        } finally {
+            setTimeout(() => {
+                uploadProgressContainer.classList.add('hidden');
+            }, 2000);
+        }
+    }
 
     confirmDelete.addEventListener('click', function() {
         if (currentId) deleteData(currentId);
@@ -154,60 +237,89 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderData(items) {
-        dataTable.innerHTML = '';
+        cardGrid.innerHTML = '';
         if (!items || items.length === 0) {
-            const row = dataTable.insertRow();
-            const cell = row.insertCell(0);
-            cell.colSpan = 6;
-            cell.textContent = 'No certifications found';
-            cell.className = 'text-center py-4 text-black';
+            noData.classList.remove('hidden');
+            cardGrid.classList.add('hidden');
             return;
         }
 
-        items.forEach((item, index) => {
-            const row = dataTable.insertRow();
+        noData.classList.add('hidden');
+        cardGrid.classList.remove('hidden');
 
-            const idCell = row.insertCell(0);
-            idCell.textContent = index + 1;
-            idCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-black';
+        items.forEach((item) => {
+            const card = document.createElement('div');
+            card.className = 'bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100 overflow-hidden flex flex-col h-full';
             
-            const titleCell = row.insertCell(1);
-            titleCell.textContent = item.title;
-            titleCell.className = 'px-4 py-2 whitespace-nowrap text-sm font-medium text-black';
+            // Status Badge
+            const statusClass = (item.status || '').toLowerCase() === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700';
             
-            const issuerCell = row.insertCell(2);
-            issuerCell.textContent = item.issuer;
-            issuerCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
-
-            const dateCell = row.insertCell(3);
-            dateCell.textContent = item.issued_date ? new Date(item.issued_date).toLocaleDateString() : 'N/A';
-            dateCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
-
-            const statusCell = row.insertCell(4);
-            statusCell.innerHTML = `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">${item.status || 'Active'}</span>`;
-            statusCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
-
-            const actionsCell = row.insertCell(5);
-            actionsCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-black text-right';
-
-            const actionButtons = document.createElement('div');
-            actionButtons.className = 'flex justify-end gap-2';
-            
-            const editBtn = document.createElement('button');
-            editBtn.innerHTML = '<i class="fas fa-edit"></i>';
-            editBtn.className = 'bg-yellow-500 hover:bg-yellow-600 text-white rounded px-2 py-1';
-            editBtn.addEventListener('click', () => editDataItem(item.id));
-
-            const deleteBtn = document.createElement('button');
-            deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
-            deleteBtn.className = 'bg-red-500 hover:bg-red-600 text-white rounded px-2 py-1';
-            deleteBtn.addEventListener('click', () => confirmDeleteData(item.id));
-
-            actionButtons.appendChild(editBtn);
-            actionButtons.appendChild(deleteBtn);
-            actionsCell.appendChild(actionButtons);
+            card.innerHTML = `
+                <div class="p-5 flex-grow">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-16 h-16 bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden border border-gray-100">
+                            ${item.badge_image_url ? 
+                                `<img src="${item.badge_image_url}" alt="${item.issuer}" class="w-full h-full object-contain p-1">` : 
+                                `<i class="fas fa-certificate text-3xl text-blue-200"></i>`
+                            }
+                        </div>
+                        <span class="px-2 py-1 text-[10px] uppercase font-bold tracking-wider rounded-md ${statusClass}">
+                            ${item.status || 'Active'}
+                        </span>
+                    </div>
+                    
+                    <h3 class="text-lg font-bold text-gray-900 mb-1 leading-tight line-clamp-2" title="${item.title}">${item.title}</h3>
+                    <p class="text-sm text-blue-600 font-medium mb-3">${item.issuer}</p>
+                    
+                    <div class="space-y-2 mt-4 pt-4 border-t border-gray-50">
+                        <div class="flex items-center text-xs text-gray-500">
+                            <i class="far fa-calendar-alt w-4 mr-2"></i>
+                            <span>Issued: ${item.issued_date || 'N/A'}</span>
+                        </div>
+                        ${item.expiry_date ? `
+                        <div class="flex items-center text-xs text-gray-500">
+                            <i class="fas fa-hourglass-end w-4 mr-2"></i>
+                            <span>Expires: ${item.expiry_date}</span>
+                        </div>` : ''}
+                        ${item.credential_id ? `
+                        <div class="flex items-center text-xs text-gray-500">
+                            <i class="fas fa-id-card w-4 mr-2"></i>
+                            <span>ID: ${item.credential_id}</span>
+                        </div>` : ''}
+                    </div>
+                </div>
+                
+                <div class="px-5 py-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center mt-auto">
+                    <div class="flex gap-2">
+                        ${item.credential_url ? 
+                            `<a href="${item.credential_url}" target="_blank" class="text-blue-500 hover:text-blue-700 transition-colors bg-white p-2 rounded-lg border border-gray-200 shadow-sm" title="Verify Online">
+                                <i class="fas fa-external-link-alt text-sm"></i>
+                            </a>` : ''
+                        }
+                        ${item.pdf_url ? 
+                            `<a href="${item.pdf_url}" target="_blank" class="text-red-500 hover:text-red-700 transition-colors bg-white p-2 rounded-lg border border-gray-200 shadow-sm" title="View PDF">
+                                <i class="far fa-file-pdf text-sm"></i>
+                            </a>` : ''
+                        }
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <button onclick="editDataItem(${item.id})" class="text-gray-600 hover:text-yellow-600 transition-colors p-2" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="confirmDeleteData(${item.id})" class="text-gray-600 hover:text-red-600 transition-colors p-2" title="Delete">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            cardGrid.appendChild(card);
         });
     }
+
+    // Adjusting global scope for onclick handlers in dynamically generated HTML
+    window.editDataItem = editDataItem;
+    window.confirmDeleteData = confirmDeleteData;
 
     async function createData(postData) {
         const response = await fetchWithToken('/api/v1/settings/certifications', {
@@ -241,8 +353,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         document.getElementById('titleStr').value = itemData.title || '';
         document.getElementById('issuer').value = itemData.issuer || '';
-        document.getElementById('issued_date').value = itemData.issued_date ? itemData.issued_date.split('T')[0] : '';
-        document.getElementById('expiry_date').value = itemData.expiry_date ? itemData.expiry_date.split('T')[0] : '';
+        document.getElementById('issued_date').value = itemData.issued_date || '';
+        document.getElementById('expiry_date').value = itemData.expiry_date || '';
         document.getElementById('credential_id').value = itemData.credential_id || '';
         document.getElementById('credential_url').value = itemData.credential_url || '';
         document.getElementById('pdf_url').value = itemData.pdf_url || '';
@@ -251,6 +363,8 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('display_order').value = itemData.display_order || 0;
         document.getElementById('is_visible').checked = itemData.is_visible;
 
+        pdfFile.value = ''; // Reset file input
+        uploadProgressContainer.classList.add('hidden');
         dataModal.classList.remove('hidden');
     }
 
