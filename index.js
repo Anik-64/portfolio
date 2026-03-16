@@ -103,13 +103,11 @@ app.get('/unauthorized', (req, res) => {
     });
 });
 
-app.get('/dashboard', authenticateRender, (req, res) => {
-    res.render('pages/dashboard', {
-        layout: 'layout',
-        title: 'Dashboard',
-        currentPath: 'dashboard',
-        customJS: '/js/dashboard.js',
-        // cache: true,
+// Public Portfolio Route
+app.get('/portfolio', async (req, res) => {
+    res.render('pages/portfolio', {
+        layout: false, 
+        title: 'Portfolio | Software Engineer'
     });
 });
 
@@ -119,7 +117,8 @@ app.get('/settings/skills', authenticateRender, (req, res) => {
         layout: 'layout', 
         title: 'Skills Settings', 
         currentPath: 'settings/skills', 
-        customJS: '/js/settings/skills.js' 
+        customJS: '/js/settings/skills.js',
+        cache: true,
     });
 });
 app.get('/settings/experiences', authenticateRender, (req, res) => {
@@ -127,7 +126,8 @@ app.get('/settings/experiences', authenticateRender, (req, res) => {
         layout: 'layout', 
         title: 'Experiences Settings', 
         currentPath: 'settings/experiences', 
-        customJS: '/js/settings/experiences.js' 
+        customJS: '/js/settings/experiences.js',
+        cache: true,
     });
 });
 app.get('/settings/projects', authenticateRender, (req, res) => {
@@ -135,7 +135,8 @@ app.get('/settings/projects', authenticateRender, (req, res) => {
         layout: 'layout', 
         title: 'Projects Settings', 
         currentPath: 'settings/projects', 
-        customJS: '/js/settings/projects.js' 
+        customJS: '/js/settings/projects.js',
+        cache: true,
     });
 });
 app.get('/settings/project-images', authenticateRender, (req, res) => {
@@ -143,7 +144,8 @@ app.get('/settings/project-images', authenticateRender, (req, res) => {
         layout: 'layout', 
         title: 'Project Images Settings', 
         currentPath: 'settings/project-images', 
-        customJS: '/js/settings/project_images.js' 
+        customJS: '/js/settings/project_images.js',
+        cache: true,
     });
 });
 app.get('/settings/certifications', authenticateRender, (req, res) => {
@@ -151,7 +153,8 @@ app.get('/settings/certifications', authenticateRender, (req, res) => {
         layout: 'layout', 
         title: 'Certifications Settings', 
         currentPath: 'settings/certifications', 
-        customJS: '/js/settings/certifications.js' 
+        customJS: '/js/settings/certifications.js',
+        cache: true,
     });
 });
 app.get('/settings/publications', authenticateRender, (req, res) => {
@@ -159,7 +162,8 @@ app.get('/settings/publications', authenticateRender, (req, res) => {
         layout: 'layout', 
         title: 'Publications Settings', 
         currentPath: 'settings/publications', 
-        customJS: '/js/settings/publications.js' 
+        customJS: '/js/settings/publications.js',
+        cache: true,
     });
 });
 app.get('/settings/education', authenticateRender, (req, res) => {
@@ -167,7 +171,8 @@ app.get('/settings/education', authenticateRender, (req, res) => {
         layout: 'layout', 
         title: 'Education Settings', 
         currentPath: 'settings/education', 
-        customJS: '/js/settings/education.js' 
+        customJS: '/js/settings/education.js',
+        cache: true,
     });
 });
 app.get('/settings/trainings', authenticateRender, (req, res) => {
@@ -175,7 +180,8 @@ app.get('/settings/trainings', authenticateRender, (req, res) => {
         layout: 'layout', 
         title: 'Trainings Settings', 
         currentPath: 'settings/trainings', 
-        customJS: '/js/settings/trainings.js' 
+        customJS: '/js/settings/trainings.js',
+        cache: true,
     });
 });
 app.get('/settings/contact-messages', authenticateRender, (req, res) => {
@@ -183,7 +189,8 @@ app.get('/settings/contact-messages', authenticateRender, (req, res) => {
         layout: 'layout', 
         title: 'Contact Messages', 
         currentPath: 'settings/contact-messages', 
-        customJS: '/js/settings/contact_messages.js' 
+        customJS: '/js/settings/contact_messages.js',
+        cache: true,
     });
 });
 app.get('/settings/audit-log', authenticateRender, (req, res) => {
@@ -191,7 +198,8 @@ app.get('/settings/audit-log', authenticateRender, (req, res) => {
         layout: 'layout', 
         title: 'Audit Log', 
         currentPath: 'settings/audit-log', 
-        customJS: '/js/settings/audit_log.js' 
+        customJS: '/js/settings/audit_log.js',
+        cache: true,
     });
 });
 
@@ -200,7 +208,8 @@ app.get('/profile', authenticateRender, (req, res) => {
         layout: 'layout', 
         title: 'My Profile', 
         currentPath: 'profile', 
-        customJS: '/js/profile.js' 
+        customJS: '/js/profile.js',
+        cache: true,
     });
 });
 
@@ -266,6 +275,9 @@ app.use(
     authenticateToken, 
     routers.profileRouter
 );
+
+// Public API Gateways (No authentication required)
+app.use('/api/v1/public', routers.portfolioPublicRouter);
 
 app.listen(process.env.PORT || 8080, () => {
     console.log(`Server running on port ${process.env.PORT || 8080}`);
