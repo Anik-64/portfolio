@@ -14,10 +14,16 @@ certificationsRouter.get('/', async (req, res) => {
     try {
         const result = await pool.query(`SELECT * FROM certifications ORDER BY display_order ASC, issued_date DESC`);
         if (result.rowCount === 0) return res.status(404).json({ error: true, message: "No data found!" });
-        res.status(200).json({ error: false, data: result.rows });
+        res.status(200).json({ 
+            error: false, 
+            data: result.rows 
+        });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ 
+            error: true, 
+            message: 'Internal Server Error' 
+        });
     }
 });
 
@@ -30,10 +36,16 @@ certificationsRouter.get('/:id',
         try {
             const result = await pool.query(`SELECT * FROM certifications WHERE id = $1`, [req.params.id]);
             if(result.rowCount === 0) return res.status(404).json({ error: true, message: 'No data found!' });
-            res.status(200).json({ error: false, data: result.rows[0] });
+            res.status(200).json({  
+                error: false, 
+                data: result.rows[0] 
+            });
         } catch (err) {
             console.error(err);
-            res.status(500).json({ error: 'Internal Server Error' });
+            res.status(500).json({ 
+                error: true, 
+                message: 'Internal Server Error' 
+            });
         }
     }
 );
@@ -42,8 +54,8 @@ certificationsRouter.post('/',
     [
         body('title').notEmpty().isString().trim().escape().isLength({ max: 255 }),
         body('issuer').notEmpty().isString().trim().escape().isLength({ max: 255 }),
-        body('issued_date').optional({ nullable: true, checkFalsy: true }).isISO8601(),
-        body('expiry_date').optional({ nullable: true, checkFalsy: true }).isISO8601(),
+        body('issued_date').optional({ nullable: true, checkFalsy: true }).isString().trim().escape(),
+        body('expiry_date').optional({ nullable: true, checkFalsy: true }).isString().trim().escape(),
         body('credential_id').optional({ nullable: true, checkFalsy: true }).isString().trim().escape().isLength({ max: 255 }),
         body('credential_url').optional({ nullable: true, checkFalsy: true }).isURL(),
         body('pdf_url').optional({ nullable: true, checkFalsy: true }).isURL(),
@@ -69,10 +81,17 @@ certificationsRouter.post('/',
             
             await logAudit(req.user.userno, 'CREATE', 'certifications', newRecord.id, { title, issuer });
             
-            res.status(201).json({ error: false, message: 'Certification created successfully', data: newRecord });
+            res.status(201).json({ 
+                error: false, 
+                message: 'Certification created successfully', 
+                data: newRecord 
+            });
         } catch (err) {
             console.error(err);
-            res.status(500).json({ error: err.detail || 'Internal Server Error' });
+            res.status(500).json({ 
+                error: true, 
+                message: 'Internal Server Error' 
+            });
         }
     }
 );
@@ -110,10 +129,17 @@ certificationsRouter.put('/:id',
             
             await logAudit(req.user.userno, 'UPDATE', 'certifications', req.params.id, { title, issuer });
             
-            res.status(200).json({ error: false, message: 'Certification updated successfully', data: result.rows[0] });
+            res.status(200).json({ 
+                error: false, 
+                message: 'Certification updated successfully', 
+                data: result.rows[0] 
+            });
         } catch (err) {
             console.error(err);
-            res.status(500).json({ error: err.detail || 'Internal Server Error' });
+            res.status(500).json({ 
+                error: true, 
+                message: 'Internal Server Error' 
+            });
         }
     }
 );
@@ -130,10 +156,17 @@ certificationsRouter.delete('/:id',
             
             await logAudit(req.user.userno, 'DELETE', 'certifications', req.params.id, { title: result.rows[0].title, issuer: result.rows[0].issuer });
             
-            res.status(200).json({ error: false, message: 'Certification deleted successfully', data: result.rows[0] });
+            res.status(200).json({ 
+                error: false, 
+                message: 'Certification deleted successfully', 
+                data: result.rows[0] 
+            });
         } catch (err) {
             console.error(err);
-            res.status(500).json({ error: err.detail || 'Internal Server Error' });
+            res.status(500).json({ 
+                error: true, 
+                message: 'Internal Server Error' 
+            });
         }
     }
 );
