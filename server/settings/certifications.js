@@ -3,6 +3,7 @@ const { commonMiddlewares, createRateLimiter } = require('../../auth/middleware/
 const xss = require('xss');
 const { validationResult, body, param } = require('express-validator');
 const pool = require('../../db'); 
+const { logAudit } = require('../utils/auditLogger');
 
 const certificationsRouter = express.Router();
 
@@ -64,7 +65,11 @@ certificationsRouter.post('/',
         `;
         try {
             const result = await pool.query(query, [title, issuer, issued_date, expiry_date, credential_id, credential_url, pdf_url, badge_image_url, status, display_order, is_visible]);
-            res.status(201).json({ error: false, message: 'Certification created successfully', data: result.rows[0] });
+            const newRecord = result.rows[0];
+            
+            await logAudit(req.user.userno, 'CREATE', 'certifications', newRecord.id, { title, issuer });
+            
+            res.status(201).json({ error: false, message: 'Certification created successfully', data: newRecord });
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: err.detail || 'Internal Server Error' });
@@ -102,6 +107,9 @@ certificationsRouter.put('/:id',
         try {
             const result = await pool.query(query, [req.params.id, title, issuer, issued_date, expiry_date, credential_id, credential_url, pdf_url, badge_image_url, status, display_order, is_visible]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Certification not found!' });
+            
+            await logAudit(req.user.userno, 'UPDATE', 'certifications', req.params.id, { title, issuer });
+            
             res.status(200).json({ error: false, message: 'Certification updated successfully', data: result.rows[0] });
         } catch (err) {
             console.error(err);
@@ -119,6 +127,9 @@ certificationsRouter.delete('/:id',
         try {
             const result = await pool.query(`DELETE FROM certifications WHERE id = $1 RETURNING *`, [req.params.id]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Certification not found!' });
+            
+            await logAudit(req.user.userno, 'DELETE', 'certifications', req.params.id, { title: result.rows[0].title, issuer: result.rows[0].issuer });
+            
             res.status(200).json({ error: false, message: 'Certification deleted successfully', data: result.rows[0] });
         } catch (err) {
             console.error(err);
