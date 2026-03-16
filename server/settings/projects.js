@@ -3,6 +3,7 @@ const { commonMiddlewares, createRateLimiter } = require('../../auth/middleware/
 const xss = require('xss');
 const { validationResult, body, param } = require('express-validator');
 const pool = require('../../db'); 
+const { logAudit } = require('../utils/auditLogger');
 
 const projectsRouter = express.Router();
 
@@ -65,7 +66,11 @@ projectsRouter.post('/',
         `;
         try {
             const result = await pool.query(query, [title, slug, short_description, long_description?xss(long_description):null, thumbnail_url, live_url, github_url, tags, category, is_featured, display_order, is_visible]);
-            res.status(201).json({ error: false, message: 'Project created successfully', data: result.rows[0] });
+            const newRecord = result.rows[0];
+            
+            await logAudit(req.user.userno, 'CREATE', 'projects', newRecord.id, { title });
+            
+            res.status(201).json({ error: false, message: 'Project created successfully', data: newRecord });
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: err.detail || 'Internal Server Error' });
@@ -104,6 +109,9 @@ projectsRouter.put('/:id',
         try {
             const result = await pool.query(query, [req.params.id, title, slug, short_description, long_description?xss(long_description):null, thumbnail_url, live_url, github_url, tags, category, is_featured, display_order, is_visible]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Project not found!' });
+            
+            await logAudit(req.user.userno, 'UPDATE', 'projects', req.params.id, { title });
+            
             res.status(200).json({ error: false, message: 'Project updated successfully', data: result.rows[0] });
         } catch (err) {
             console.error(err);
@@ -121,6 +129,9 @@ projectsRouter.delete('/:id',
         try {
             const result = await pool.query(`DELETE FROM projects WHERE id = $1 RETURNING *`, [req.params.id]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Project not found!' });
+            
+            await logAudit(req.user.userno, 'DELETE', 'projects', req.params.id, { title: result.rows[0].title });
+            
             res.status(200).json({ error: false, message: 'Project deleted successfully', data: result.rows[0] });
         } catch (err) {
             console.error(err);
