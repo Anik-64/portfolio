@@ -12,6 +12,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const floatingMessage = document.getElementById('floatingMessage');
     const searchInput = document.getElementById('searchInput');
     const projectSelect = document.getElementById('project_id');
+    const imageFile = document.getElementById('image_file');
+    const imageUrlInput = document.getElementById('image_url');
+    const uploadProgressContainer = document.getElementById('uploadProgressContainer');
+    const uploadProgressBar = document.getElementById('uploadProgressBar');
+    const uploadStatus = document.getElementById('uploadStatus');
 
     let originalData = [];
     let currentId = null;
@@ -28,6 +33,8 @@ document.addEventListener('DOMContentLoaded', function() {
         currentId = null;
         modalTitle.textContent = 'Add Project Image';
         dataForm.reset();
+        imageFile.value = '';
+        uploadProgressContainer.classList.add('hidden');
         document.getElementById('display_order').value = 0;
         dataModal.classList.remove('hidden');
     });
@@ -48,27 +55,100 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 500));
 
-    dataForm.addEventListener('submit', function(e) {
+    dataForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-        
-        const formData = {
-            project_id: parseInt(projectSelect.value),
-            image_url: document.getElementById('image_url').value.trim(),
-            caption: document.getElementById('caption').value.trim() || null,
-            display_order: parseInt(document.getElementById('display_order').value) || 0
-        };
 
-        if (!formData.project_id || !formData.image_url) {
-            showMessage('Project and Image URL are required', 'error');
-            return;
-        }
+        const saveBtn = dataForm.querySelector('button[type="submit"]');
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Saving...';
 
-        if (currentId) {
-            updateData(currentId, formData);
-        } else {
-            createData(formData);
+        try {
+            // Upload image file first if one was selected
+            if (imageFile.files.length > 0) {
+                const uploadedUrl = await uploadImageFile(imageFile.files[0]);
+                if (!uploadedUrl) {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Save';
+                    return;
+                }
+                imageUrlInput.value = uploadedUrl;
+            }
+
+            const formData = {
+                project_id: parseInt(projectSelect.value),
+                image_url: imageUrlInput.value.trim(),
+                caption: document.getElementById('caption').value.trim() || null,
+                display_order: parseInt(document.getElementById('display_order').value) || 0
+            };
+
+            if (!formData.project_id || !formData.image_url) {
+                showMessage('Project and Image URL are required', 'error');
+                return;
+            }
+
+            if (currentId) {
+                await updateData(currentId, formData);
+            } else {
+                await createData(formData);
+            }
+        } catch (err) {
+            console.error(err);
+            showMessage('Error during save', 'error');
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save';
         }
     });
+
+    async function uploadImageFile(file) {
+        uploadProgressContainer.classList.remove('hidden');
+        uploadProgressBar.style.width = '0%';
+        uploadStatus.textContent = 'Uploading...';
+
+        const formData = new FormData();
+        formData.append('coverImage', file);
+
+        const accessToken = localStorage.getItem('accessToken');
+
+        try {
+            const xhr = new XMLHttpRequest();
+            const promise = new Promise((resolve, reject) => {
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percent = (e.loaded / e.total) * 100;
+                        uploadProgressBar.style.width = percent + '%';
+                    }
+                });
+
+                xhr.onreadystatechange = () => {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            const response = JSON.parse(xhr.responseText);
+                            resolve(response.data.url);
+                        } else {
+                            reject(new Error('Upload failed'));
+                        }
+                    }
+                };
+            });
+
+            xhr.open('POST', '/api/v1/upload/book/cover', true);
+            xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+            xhr.send(formData);
+
+            const url = await promise;
+            uploadStatus.textContent = 'Upload complete!';
+            return url;
+        } catch (err) {
+            console.error('Upload error:', err);
+            showMessage('Image upload failed', 'error');
+            return null;
+        } finally {
+            setTimeout(() => {
+                uploadProgressContainer.classList.add('hidden');
+            }, 2000);
+        }
+    }
 
     confirmDelete.addEventListener('click', function() {
         if (currentId) deleteData(currentId);
@@ -249,10 +329,12 @@ document.addEventListener('DOMContentLoaded', function() {
         modalTitle.textContent = 'Edit Project Image';
         
         projectSelect.value = itemData.project_id || '';
-        document.getElementById('image_url').value = itemData.image_url || '';
+        imageUrlInput.value = itemData.image_url || '';
         document.getElementById('caption').value = itemData.caption || '';
         document.getElementById('display_order').value = itemData.display_order || 0;
 
+        imageFile.value = ''; // Reset file input
+        uploadProgressContainer.classList.add('hidden');
         dataModal.classList.remove('hidden');
     }
 
