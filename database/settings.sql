@@ -50,7 +50,7 @@ CREATE TABLE project_images (
   display_order INT DEFAULT 0
 );
 
--- CERTIFICATIONS
+-- CERTIFICATIONS (Done)
 CREATE TABLE certifications (
   id SERIAL PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
