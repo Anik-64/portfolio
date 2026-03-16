@@ -24,7 +24,7 @@ CREATE TABLE experiences (
   is_visible BOOLEAN DEFAULT true
 );
 
--- PROJECTS
+-- PROJECTS (Done)
 CREATE TABLE projects (
   id SERIAL PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
@@ -42,6 +42,7 @@ CREATE TABLE projects (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- PROJECT IMAGES (Done)
 CREATE TABLE project_images (
   id SERIAL PRIMARY KEY,
   project_id INT REFERENCES projects(id) ON DELETE CASCADE,
