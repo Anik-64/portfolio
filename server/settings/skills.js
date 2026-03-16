@@ -4,6 +4,7 @@ const xss = require('xss');
 const he = require('he');
 const { validationResult, body, param } = require('express-validator');
 const pool = require('../../db'); 
+const { logAudit } = require('../utils/auditLogger');
 
 const skillsRouter = express.Router();
 
@@ -96,10 +97,14 @@ skillsRouter.post('/',
         `;
         try {
             const result = await pool.query(query, [category, name, icon_slug, display_order, is_visible]);
+            const newRecord = result.rows[0];
+            
+            await logAudit(req.user.userno, 'CREATE', 'skills', newRecord.id, { name: newRecord.name, category: newRecord.category });
+            
             res.status(201).json({ 
                 error: false, 
                 message: 'Skill created successfully', 
-                data: result.rows[0] 
+                data: newRecord 
             });
         } catch (err) {
             console.error(err);
@@ -136,6 +141,9 @@ skillsRouter.put('/:id',
         try {
             const result = await pool.query(query, [req.params.id, category, name, icon_slug, display_order, is_visible]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Skill not found!' });
+            
+            await logAudit(req.user.userno, 'UPDATE', 'skills', req.params.id, { name, category });
+            
             res.status(200).json({ 
                 error: false, 
                 message: 'Skill updated successfully', 
@@ -161,6 +169,9 @@ skillsRouter.delete('/:id',
         try {
             const result = await pool.query(`DELETE FROM skills WHERE id = $1 RETURNING *`, [req.params.id]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Skill not found!' });
+            
+            await logAudit(req.user.userno, 'DELETE', 'skills', req.params.id, { name: result.rows[0].name });
+            
             res.status(200).json({ 
                 error: false, 
                 message: 'Skill deleted successfully', 
