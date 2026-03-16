@@ -1,0 +1,59 @@
+<div class="container mx-auto px-6">
+    <div class="max-w-5xl mx-auto bg-gray-50 dark:bg-dark-card rounded-3xl overflow-hidden border border-gray-100 dark:border-dark-border">
+        <div class="flex flex-col lg:flex-row">
+            <!-- Info Column -->
+            <div class="lg:w-5/12 p-8 lg:p-12 bg-primary text-white">
+                <h2 class="text-3xl font-bold mb-6">Let's build something great.</h2>
+                <p class="text-blue-100 mb-10 leading-relaxed">
+                    I'm always open to discussing web development work or partnership opportunities.
+                </p>
+                
+                <div id="contactDetails" class="space-y-6">
+                    <!-- Contact details -->
+                </div>
+                
+                <!-- Social Links -->
+                <div id="socialLinks" class="flex items-center gap-4 mt-12">
+                    <!-- Social buttons -->
+                </div>
+            </div>
+            
+            <!-- Form Column -->
+            <div class="lg:w-7/12 p-8 lg:p-12">
+                <form id="contactForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
+                            <input type="text" name="name" required placeholder="John Doe" class="contact-input">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
+                            <input type="email" name="email" required placeholder="john@example.com" class="contact-input">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Subject</label>
+                        <input type="text" name="subject" placeholder="Project Inquiry" class="contact-input">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Message</label>
+                        <textarea name="message" required rows="4" placeholder="Tell me about your project..." class="contact-input"></textarea>
+                    </div>
+                    
+                    <button type="submit" id="submitContact" class="w-full py-4 bg-primary text-white font-bold rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+                        <span>Send Message</span>
+                        <i class="fas fa-paper-plane text-xs"></i>
+                    </button>
+                    
+                    <div id="contactStatus" class="hidden text-center text-sm font-medium p-3 rounded-lg mt-4"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .contact-input {
+        @apply w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-bg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all dark:text-white dark:placeholder-gray-500;
+    }
+</style>
