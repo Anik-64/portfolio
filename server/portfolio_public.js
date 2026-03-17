@@ -61,7 +61,7 @@ portfolioPublicRouter.get('/data', async (req, res) => {
             `),
             pool.query('SELECT * FROM skills WHERE is_visible = true ORDER BY category, display_order'),
             pool.query('SELECT * FROM experiences WHERE is_visible = true ORDER BY display_order, start_date DESC'),
-            pool.query('SELECT * FROM projects WHERE is_visible = true ORDER BY display_order, created_at DESC'),
+            pool.query('SELECT * FROM projects WHERE is_visible = true ORDER BY is_featured DESC, display_order, created_at DESC'),
             pool.query('SELECT * FROM project_images ORDER BY display_order'),
             pool.query('SELECT * FROM certifications WHERE is_visible = true ORDER BY display_order, issued_date DESC'),
             pool.query('SELECT * FROM publications WHERE is_visible = true ORDER BY published_date DESC'),
