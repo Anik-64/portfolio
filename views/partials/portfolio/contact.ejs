@@ -1,7 +1,7 @@
-<div class="container mx-auto px-6">
+<!-- <div class="container mx-auto px-6">
     <div class="max-w-5xl mx-auto bg-gray-50 dark:bg-dark-card rounded-3xl overflow-hidden border border-gray-100 dark:border-dark-border">
         <div class="flex flex-col lg:flex-row">
-            <!-- Info Column -->
+   
             <div class="lg:w-5/12 p-8 lg:p-12 bg-primary text-white">
                 <h2 class="text-3xl font-bold mb-6">Let's build something great.</h2>
                 <p class="text-blue-100 mb-10 leading-relaxed">
@@ -9,16 +9,16 @@
                 </p>
                 
                 <div id="contactDetails" class="space-y-6">
-                    <!-- Contact details -->
+                    
                 </div>
                 
-                <!-- Social Links -->
+                
                 <div id="socialLinks" class="flex items-center gap-4 mt-12">
-                    <!-- Social buttons -->
+                    
                 </div>
             </div>
             
-            <!-- Form Column -->
+            
             <div class="lg:w-7/12 p-8 lg:p-12">
                 <form id="contactForm" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -55,5 +55,104 @@
 <style>
     .contact-input {
         @apply w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-bg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all dark:text-white dark:placeholder-gray-500;
+    }
+</style> -->
+
+
+<div class="container mx-auto px-6">
+    <div class="max-w-5xl mx-auto border border-gray-100 dark:border-dark-border rounded-3xl overflow-hidden bg-white dark:bg-dark-card">
+        <div class="flex flex-col lg:flex-row">
+
+            <!-- LEFT: Info Panel -->
+            <div class="lg:w-5/12 p-10 lg:p-12 flex flex-col" style="background: #0C2340;">
+
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.14em] mb-6 w-fit"
+                     style="color: #85B7EB; background: rgba(133,183,235,0.12);">
+                    <span class="w-1.5 h-1.5 rounded-full" style="background:#85B7EB"></span>
+                    Get in touch
+                </div>
+
+                <h2 class="text-2xl font-bold leading-snug mb-3" style="color:#fff;">
+                    Let's build something great together.
+                </h2>
+                <p class="text-sm leading-relaxed mb-8" style="color:#85B7EB;">
+                    Open to discussing new projects, cloud architecture consulting, or DevOps collaborations.
+                </p>
+
+                <div class="h-px mb-8" style="background: rgba(133,183,235,0.15);"></div>
+
+                <!-- Contact Details (injected) -->
+                <div id="contactDetails" class="space-y-5 flex-grow"></div>
+
+                <!-- Social Links (injected) -->
+                <div id="socialLinks" class="flex items-center gap-2.5 mt-10"></div>
+            </div>
+
+            <!-- RIGHT: Form Panel -->
+            <div class="lg:w-7/12 p-10 lg:p-12 bg-white dark:bg-dark-card">
+                <h3 class="text-base font-bold dark:text-white mb-1">Send a message</h3>
+                <p class="text-xs text-gray-400 mb-8">I typically respond within 24 hours.</p>
+
+                <form id="contactForm" class="space-y-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-[0.08em] text-gray-400 dark:text-gray-500 mb-2">Full name</label>
+                            <input type="text" name="name" required placeholder="John Doe" class="contact-input">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-[0.08em] text-gray-400 dark:text-gray-500 mb-2">Email address</label>
+                            <input type="email" name="email" required placeholder="john@example.com" class="contact-input">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-[0.08em] text-gray-400 dark:text-gray-500 mb-2">Subject</label>
+                        <input type="text" name="subject" placeholder="Project inquiry, collaboration..." class="contact-input">
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-[0.08em] text-gray-400 dark:text-gray-500 mb-2">Message</label>
+                        <textarea name="message" id="messageField" required rows="5"
+                                  placeholder="Tell me about your project or idea..."
+                                  class="contact-input resize-none"></textarea>
+                        <div class="text-right mt-1">
+                            <span id="charCount" class="text-[10px] text-gray-300 dark:text-gray-600 font-mono">0 / 1000</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submitContact"
+                            class="w-full py-3.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 transition-all"
+                            style="background:#185FA5;"
+                            onmouseover="this.style.background='#0C447C'" onmouseout="this.style.background='#185FA5'">
+                        <span>Send message</span>
+                        <i class="fas fa-paper-plane text-xs"></i>
+                    </button>
+
+                    <div id="contactStatus" class="hidden text-center text-sm font-medium p-4 rounded-xl"></div>
+                </form>
+
+                <!-- Availability indicator -->
+                <div class="flex items-center justify-center gap-2 mt-6">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    <span class="text-[11px] text-gray-400">Available for freelance &amp; full-time opportunities</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .contact-input {
+        @apply w-full px-4 py-3 rounded-xl text-sm
+               border border-gray-100 dark:border-dark-border
+               bg-gray-50 dark:bg-dark-bg
+               text-gray-900 dark:text-white
+               placeholder-gray-300 dark:placeholder-gray-600
+               outline-none transition-all duration-200;
+    }
+    .contact-input:focus {
+        @apply border-blue-300 dark:border-blue-700 bg-white dark:bg-dark-card;
+        box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
     }
 </style>
