@@ -383,41 +383,107 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // --- Contact Info ---
+        // const socialLinks = document.getElementById('socialLinks');
+        // socialLinks.innerHTML = '';
+        // const contactDetails = document.getElementById('contactDetails');
+        // contactDetails.innerHTML = '';
+
+        // contacts.forEach(c => {
+            
+        //     const lowerType = c.contacttypetitle.toLowerCase();
+        //     if (['github', 'linkedin', 'docker', 'credly'].includes(lowerType)) {
+        //         let icon = 'fas fa-link';
+        //         if (lowerType === 'github') icon = 'fab fa-github';
+        //         else if (lowerType === 'linkedin') icon = 'fab fa-linkedin';
+        //         else if (lowerType === 'docker') icon = 'fab fa-docker';
+        //         else if (lowerType === 'credly') icon = 'fas fa-award';
+                
+        //         const link = document.createElement('a');
+        //         link.href = c.contact;
+        //         link.target = "_blank";
+        //         link.className = "w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all text-xl tooltip-trigger relative";
+        //         link.innerHTML = `<i class="${icon}"></i>
+        //                           <span class="absolute -top-8 bg-gray-900 text-white text-[10px] py-1 px-2 rounded opacity-0 pointer-events-none transition-opacity whitespace-nowrap">${c.contacttypetitle}</span>`;
+                
+                
+        //         link.addEventListener('mouseenter', () => link.querySelector('span').classList.remove('opacity-0'));
+        //         link.addEventListener('mouseleave', () => link.querySelector('span').classList.add('opacity-0'));
+                
+        //         socialLinks.appendChild(link);
+        //     } else if (lowerType === 'email' || lowerType === 'mobile' || lowerType === 'phone') {
+        //         const icon = lowerType === 'email' ? 'far fa-envelope' : 'fas fa-mobile-alt';
+        //         const div = document.createElement('div');
+        //         div.className = "flex items-center gap-4";
+        //         div.innerHTML = `<i class="${icon} text-lg text-blue-200"></i><span class="text-sm font-medium">${c.contactprefix ? c.contactprefix + ' ' : ''}${c.contact}</span>`;
+        //         contactDetails.appendChild(div);
+        //     }
+        // });
+        // --- Contact Info ---
         const socialLinks = document.getElementById('socialLinks');
         socialLinks.innerHTML = '';
         const contactDetails = document.getElementById('contactDetails');
         contactDetails.innerHTML = '';
 
+        const contactIconMap = {
+            email:    { icon: 'far fa-envelope',   label: 'Email'    },
+            mobile:   { icon: 'fas fa-mobile-alt', label: 'Phone'    },
+            phone:    { icon: 'fas fa-mobile-alt', label: 'Phone'    },
+            location: { icon: 'fas fa-map-pin',    label: 'Location' },
+        };
+        const socialIconMap = {
+            github:   'fab fa-github',
+            linkedin: 'fab fa-linkedin',
+            docker:   'fab fa-docker',
+            credly:   'fas fa-award',
+        };
+
         contacts.forEach(c => {
-            // Treat GitHub/LinkedIn/Docker/Credly special
             const lowerType = c.contacttypetitle.toLowerCase();
-            if (['github', 'linkedin', 'docker', 'credly'].includes(lowerType)) {
-                let icon = 'fas fa-link';
-                if (lowerType === 'github') icon = 'fab fa-github';
-                else if (lowerType === 'linkedin') icon = 'fab fa-linkedin';
-                else if (lowerType === 'docker') icon = 'fab fa-docker';
-                else if (lowerType === 'credly') icon = 'fas fa-award';
-                
-                const link = document.createElement('a');
-                link.href = c.contact;
-                link.target = "_blank";
-                link.className = "w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all text-xl tooltip-trigger relative";
-                link.innerHTML = `<i class="${icon}"></i>
-                                  <span class="absolute -top-8 bg-gray-900 text-white text-[10px] py-1 px-2 rounded opacity-0 pointer-events-none transition-opacity whitespace-nowrap">${c.contacttypetitle}</span>`;
-                
-                // Add simple hover tooltip behavior
-                link.addEventListener('mouseenter', () => link.querySelector('span').classList.remove('opacity-0'));
-                link.addEventListener('mouseleave', () => link.querySelector('span').classList.add('opacity-0'));
-                
-                socialLinks.appendChild(link);
-            } else if (lowerType === 'email' || lowerType === 'mobile' || lowerType === 'phone') {
-                const icon = lowerType === 'email' ? 'far fa-envelope' : 'fas fa-mobile-alt';
+
+            if (socialIconMap[lowerType]) {
+                // Social button — styled for dark panel
+                const a = document.createElement('a');
+                a.href = c.contact;
+                a.target = '_blank';
+                a.title = c.contacttypetitle;
+                a.className = 'w-9 h-9 rounded-lg flex items-center justify-center transition-all text-sm';
+                a.style.cssText = 'background:rgba(133,183,235,0.1); border:0.5px solid rgba(133,183,235,0.2); color:#85B7EB;';
+                a.innerHTML = `<i class="${socialIconMap[lowerType]}"></i>`;
+                a.addEventListener('mouseover', () => a.style.background = 'rgba(133,183,235,0.2)');
+                a.addEventListener('mouseout',  () => a.style.background = 'rgba(133,183,235,0.1)');
+                socialLinks.appendChild(a);
+
+            } else {
+                // Contact detail row — styled for dark panel
+                const cfg = contactIconMap[lowerType] || { icon: 'fas fa-link', label: c.contacttypetitle };
                 const div = document.createElement('div');
-                div.className = "flex items-center gap-4";
-                div.innerHTML = `<i class="${icon} text-lg text-blue-200"></i><span class="text-sm font-medium">${c.contactprefix ? c.contactprefix + ' ' : ''}${c.contact}</span>`;
+                div.className = 'flex items-center gap-3';
+                div.innerHTML = `
+                    <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 text-xs"
+                        style="background:rgba(133,183,235,0.1); color:#85B7EB;">
+                        <i class="${cfg.icon}"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] uppercase tracking-[0.1em] font-bold mb-0.5" style="color:#85B7EB; opacity:0.7;">${cfg.label}</p>
+                        <p class="text-sm font-medium" style="color:#fff;">${c.contactprefix ? c.contactprefix + ' ' : ''}${c.contact}</p>
+                    </div>
+                `;
                 contactDetails.appendChild(div);
             }
         });
+
+        // Character counter for message field
+        const msgField = document.getElementById('messageField');
+        const charCount = document.getElementById('charCount');
+        if (msgField && charCount) {
+            msgField.addEventListener('input', () => {
+                const len = msgField.value.length;
+                charCount.textContent = `${len} / 1000`;
+                if (len > 900) charCount.style.color = '#E24B4A';
+                else charCount.style.color = '';
+                if (len > 1000) msgField.value = msgField.value.slice(0, 1000);
+            });
+        }
 
         // --- Setup Elements ---
         initProjectFilters();
