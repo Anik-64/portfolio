@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const icon = lowerType === 'email' ? 'far fa-envelope' : 'fas fa-mobile-alt';
                 const div = document.createElement('div');
                 div.className = "flex items-center gap-4";
-                div.innerHTML = `<i class="${icon} text-lg text-blue-200"></i><span class="text-sm font-medium">${c.contact}</span>`;
+                div.innerHTML = `<i class="${icon} text-lg text-blue-200"></i><span class="text-sm font-medium">${c.contactprefix ? c.contactprefix + ' ' : ''}${c.contact}</span>`;
                 contactDetails.appendChild(div);
             }
         });
