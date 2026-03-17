@@ -84,24 +84,73 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- Skills Registry ---
         const skillsContainer = document.getElementById('skillsContainer');
         skillsContainer.innerHTML = '';
-        
+        skillsContainer.className = 'grid grid-cols-1 md:grid-cols-2 gap-5';
+
+        // Category visual config — maps category name keywords to color theme
+        const categoryConfig = {
+            'devops':      { color: 'blue',   dot: '#378ADD', icon: 'fas fa-cloud' },
+            'cloud':       { color: 'blue',   dot: '#378ADD', icon: 'fas fa-cloud' },
+            'ci':          { color: 'green',  dot: '#639922', icon: 'fas fa-infinity' },
+            'automation':  { color: 'green',  dot: '#639922', icon: 'fas fa-infinity' },
+            'backend':     { color: 'purple', dot: '#7F77DD', icon: 'fas fa-code' },
+            'programming': { color: 'purple', dot: '#7F77DD', icon: 'fas fa-code' },
+            'infra':       { color: 'amber',  dot: '#BA7517', icon: 'fas fa-database' },
+            'database':    { color: 'amber',  dot: '#BA7517', icon: 'fas fa-database' },
+            'version':     { color: 'teal',   dot: '#1D9E75', icon: 'fas fa-code-branch' },
+            'tools':       { color: 'gray',   dot: '#888780', icon: 'fas fa-wrench' },
+        };
+
+        const colorClasses = {
+            blue:   { bg: 'bg-blue-50 dark:bg-blue-900/20',   icon: 'text-blue-600 dark:text-blue-400'   },
+            green:  { bg: 'bg-green-50 dark:bg-green-900/20', icon: 'text-green-700 dark:text-green-400' },
+            purple: { bg: 'bg-purple-50 dark:bg-purple-900/20', icon: 'text-purple-600 dark:text-purple-400' },
+            amber:  { bg: 'bg-amber-50 dark:bg-amber-900/20', icon: 'text-amber-700 dark:text-amber-400' },
+            teal:   { bg: 'bg-teal-50 dark:bg-teal-900/20',   icon: 'text-teal-600 dark:text-teal-400'  },
+            gray:   { bg: 'bg-gray-100 dark:bg-gray-800',     icon: 'text-gray-500 dark:text-gray-400'  },
+        };
+
+        function getCategoryConfig(categoryName) {
+            const lower = categoryName.toLowerCase();
+            for (const [key, val] of Object.entries(categoryConfig)) {
+                if (lower.includes(key)) return val;
+            }
+            return { color: 'gray', dot: '#888780', icon: 'fas fa-layer-group' };
+        }
+
         Object.keys(skills).forEach(category => {
-            const categorySection = document.createElement('div');
-            categorySection.innerHTML = `
-                <h3 class="text-xs font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 mb-6 flex items-center">
-                    ${category}
-                    <span class="ml-4 flex-grow h-px bg-gray-100 dark:bg-dark-border"></span>
-                </h3>
-                <div class="flex flex-wrap gap-4">
-                    ${skills[category].map(skill => `
-                        <div class="tag-pill flex items-center gap-2">
-                            ${skill.icon_slug ? `<i class="${skill.icon_slug} text-base"></i>` : ''}
-                            <span>${skill.name}</span>
-                        </div>
+            const cfg = getCategoryConfig(category);
+            const colors = colorClasses[cfg.color] || colorClasses.gray;
+            const skillList = skills[category];
+
+            const card = document.createElement('div');
+            card.className = 'bg-white dark:bg-dark-card border border-gray-100 dark:border-dark-border rounded-2xl p-6 transition-all duration-300 hover:border-gray-200 dark:hover:border-gray-600';
+
+            card.innerHTML = `
+                <div class="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100 dark:border-dark-border">
+                    <div class="w-9 h-9 rounded-lg ${colors.bg} flex items-center justify-center flex-shrink-0">
+                        <i class="${cfg.icon} text-sm ${colors.icon}"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold dark:text-white leading-tight">${category}</h3>
+                        <p class="text-[10px] text-gray-400 mt-0.5">${skillList.length} ${skillList.length === 1 ? 'technology' : 'technologies'}</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    ${skillList.map(skill => `
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium
+                                    bg-gray-50 dark:bg-gray-800/60
+                                    border border-gray-100 dark:border-gray-700
+                                    text-gray-600 dark:text-gray-300
+                                    rounded-lg transition-colors hover:border-gray-300 dark:hover:border-gray-500">
+                            <span class="w-1.5 h-1.5 rounded-full flex-shrink-0" style="background-color: ${cfg.dot}"></span>
+                            ${skill.icon_slug ? `<i class="${skill.icon_slug} text-xs"></i>` : ''}
+                            ${skill.name}
+                        </span>
                     `).join('')}
                 </div>
             `;
-            skillsContainer.appendChild(categorySection);
+
+            skillsContainer.appendChild(card);
         });
 
         // --- Experience Timeline ---
