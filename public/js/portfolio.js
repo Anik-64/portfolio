@@ -310,40 +310,72 @@ document.addEventListener('DOMContentLoaded', () => {
             pubContainer.appendChild(item);
         });
 
-        // --- Education & Training ---
+        // --- Education ---
         const eduContainer = document.getElementById('educationContainer');
         eduContainer.innerHTML = '';
+
         education.forEach(edu => {
             const div = document.createElement('div');
-            div.className = 'flex gap-6';
+            div.className = 'bg-white dark:bg-dark-card border border-gray-100 dark:border-dark-border rounded-2xl p-5 flex gap-4 items-start transition-colors hover:border-gray-200 dark:hover:border-gray-600';
             div.innerHTML = `
-                <div class="w-12 h-12 rounded-xl bg-gray-50 dark:bg-dark-card border border-gray-100 dark:border-dark-border flex-shrink-0 flex items-center justify-center overflow-hidden p-2">
-                    ${edu.institution_logo_url ? `<img src="${edu.institution_logo_url}" class="w-full h-full object-contain">` : `<i class="fas fa-university text-primary/20"></i>`}
+                <div class="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center flex-shrink-0">
+                    ${edu.institution_logo_url
+                        ? `<img src="${edu.institution_logo_url}" class="w-7 h-7 object-contain">`
+                        : `<i class="fas fa-graduation-cap text-blue-500 dark:text-blue-400 text-base"></i>`}
                 </div>
-                <div>
-                    <h4 class="font-bold dark:text-white">${edu.degree}</h4>
-                    <p class="text-sm text-gray-500 mb-1">${edu.field_of_study}</p>
-                    <p class="text-xs text-gray-400 font-medium">${edu.institution} • ${edu.start_year}-${edu.end_year}</p>
-                    ${edu.cgpa ? `<div class="mt-2 text-[10px] font-bold text-primary">CGPA: ${edu.cgpa}</div>` : ''}
+                <div class="flex-1 min-w-0">
+                    <h4 class="font-bold text-sm dark:text-white leading-snug mb-1">${edu.degree}</h4>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">${edu.field_of_study || ''}</p>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-[11px] text-gray-400 dark:text-gray-500">${edu.institution}</span>
+                        <span class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
+                        <span class="text-[11px] text-gray-400 dark:text-gray-500 font-mono">${edu.start_year} – ${edu.end_year || 'Present'}</span>
+                        ${edu.cgpa ? `
+                        <span class="text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded-full">
+                            CGPA ${edu.cgpa}
+                        </span>` : ''}
+                    </div>
                 </div>
             `;
             eduContainer.appendChild(div);
         });
 
+        // --- Trainings ---
         const trainContainer = document.getElementById('trainingsContainer');
         trainContainer.innerHTML = '';
-        trainings.forEach(tr => {
+
+        const trainingAccentColors = [
+            { bar: 'bg-purple-500', badge: 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20' },
+            { bar: 'bg-teal-500',   badge: 'text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/20' },
+            { bar: 'bg-blue-500',   badge: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20' },
+            { bar: 'bg-amber-500',  badge: 'text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20' },
+        ];
+
+        trainings.forEach((tr, idx) => {
+            const accent = trainingAccentColors[idx % trainingAccentColors.length];
+            const startDate = tr.start_date ? formatDate(tr.start_date) : null;
+            const endDate   = tr.end_date   ? formatDate(tr.end_date)   : null;
+            const dateStr   = startDate && endDate ? `${startDate} → ${endDate}` : (startDate || endDate || '');
+
             const div = document.createElement('div');
-            div.className = 'flex gap-6';
+            div.className = 'bg-white dark:bg-dark-card border border-gray-100 dark:border-dark-border rounded-2xl overflow-hidden transition-colors hover:border-gray-200 dark:hover:border-gray-600 flex';
             div.innerHTML = `
-                <div class="w-10 h-10 rounded-lg bg-gray-50 dark:bg-dark-card border border-gray-100 dark:border-dark-border flex-shrink-0 flex items-center justify-center">
-                    <i class="fas fa-certificate text-primary/30"></i>
-                </div>
-                <div>
-                    <h4 class="font-bold text-sm dark:text-white leading-tight mb-1">${tr.program_name}</h4>
-                    <p class="text-xs text-gray-500">${tr.institute}</p>
-                    <div class="mt-2">
-                        ${tr.certificate_url ? `<a href="${tr.certificate_url}" target="_blank" class="text-[10px] font-bold text-primary hover:underline uppercase tracking-tighter">View Certificate</a>` : ''}
+                <div class="w-1 flex-shrink-0 ${accent.bar} rounded-l-2xl"></div>
+                <div class="flex-1 p-5">
+                    <div class="flex items-start justify-between gap-3 mb-2">
+                        <h4 class="font-bold text-sm dark:text-white leading-snug">${tr.program_name}</h4>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${accent.badge}">
+                            ${tr.end_date ? 'Completed' : 'In Progress'}
+                        </span>
+                    </div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">${tr.institute}</p>
+                    <div class="flex items-center justify-between">
+                        ${dateStr ? `<span class="text-[10px] text-gray-400 font-mono">${dateStr}</span>` : '<span></span>'}
+                        ${tr.certificate_url ? `
+                        <a href="${tr.certificate_url}" target="_blank"
+                        class="text-[11px] font-bold text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1">
+                            View certificate <i class="fas fa-arrow-up-right-from-square text-[9px]"></i>
+                        </a>` : ''}
                     </div>
                 </div>
             `;
