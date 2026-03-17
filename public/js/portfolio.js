@@ -112,31 +112,61 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- Projects Grid ---
         const projectGrid = document.getElementById('projectGrid');
+        const projectFilters = document.getElementById('projectFilters');
         projectGrid.innerHTML = '';
         
+        // Dynamic Filters logic
+        const categories = [...new Set(projects.map(p => p.category || 'Misc'))];
+        projectFilters.innerHTML = '<button data-filter="all" class="filter-btn active">All</button>';
+        categories.forEach(cat => {
+            const btn = document.createElement('button');
+            btn.className = 'filter-btn';
+            const slug = cat.toLowerCase().replace(/\s+/g, '-');
+            btn.setAttribute('data-filter', slug);
+            btn.textContent = cat;
+            projectFilters.appendChild(btn);
+        });
+
         projects.forEach(proj => {
             const card = document.createElement('div');
-            card.className = "project-card " + (proj.category || 'misc').toLowerCase();
+            const categorySlug = (proj.category || 'misc').toLowerCase().replace(/\s+/g, '-');
+            card.className = "project-card " + categorySlug;
+            const thumbnail = proj.thumbnail_url || 'https://via.placeholder.com/600x400?text=' + encodeURIComponent(proj.title);
+            
             card.innerHTML = `
                 <div class="card-glass h-full flex flex-col overflow-hidden">
                     <div class="relative group cursor-pointer aspect-video overflow-hidden">
-                        <img src="${proj.thumbnail_url || 'https://via.placeholder.com/600x400?text=No+Preview'}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        <img src="${thumbnail}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        ${proj.is_featured ? `
+                        <div class="absolute top-4 right-4 z-20">
+                            <span class="px-3 py-1 bg-primary text-white text-[10px] font-bold uppercase rounded-full shadow-lg">Featured</span>
+                        </div>
+                        ` : ''}
                         <div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             ${proj.live_url ? `<a href="${proj.live_url}" target="_blank" class="p-2 h-10 w-10 bg-white rounded-full text-primary flex items-center justify-center m-1 shadow-lg"><i class="fas fa-external-link-alt"></i></a>` : ''}
                             ${proj.github_url ? `<a href="${proj.github_url}" target="_blank" class="p-2 h-10 w-10 bg-white rounded-full text-gray-900 flex items-center justify-center m-1 shadow-lg"><i class="fab fa-github"></i></a>` : ''}
                         </div>
                     </div>
-                    <div class="p-6 flex-grow">
+                    <div class="p-6 flex-grow flex flex-col">
                         <div class="flex flex-wrap gap-2 mb-4">
                             ${(proj.tags || []).map(tag => `<span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-[10px] rounded uppercase font-bold text-gray-500">${tag}</span>`).join('')}
                         </div>
                         <h4 class="text-lg font-bold mb-2 dark:text-white">${proj.title}</h4>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">${proj.short_description || ''}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">${proj.short_description || ''}</p>
+                        
+                        <div class="mt-auto pt-4 border-t border-gray-100 dark:border-dark-border">
+                            <button onclick='window.openProjectModal(${JSON.stringify(proj).replace(/'/g, "&apos;")})' class="text-sm font-bold text-primary hover:text-blue-600 transition-colors flex items-center gap-2">
+                                Learn More <i class="fas fa-arrow-right text-xs"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
             projectGrid.appendChild(card);
         });
+
+        // Expose modal function globally for onclick
+        window.openProjectModal = openProjectModal;
 
         // --- Certifications ---
         const certGrid = document.getElementById('certificationsGrid');
@@ -373,31 +403,90 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initProjectFilters() {
-        const btns = document.querySelectorAll('.filter-btn');
-        const cards = document.querySelectorAll('.project-card');
+        const filtersContainer = document.getElementById('projectFilters');
+        
+        filtersContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('.filter-btn');
+            if (!btn) return;
 
-        btns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const filter = btn.getAttribute('data-filter');
-                
-                btns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
+            const filter = btn.getAttribute('data-filter');
+            const btns = filtersContainer.querySelectorAll('.filter-btn');
+            const cards = document.querySelectorAll('.project-card');
+            
+            btns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
 
-                cards.forEach(card => {
-                    if (filter === 'all' || card.classList.contains(filter)) {
-                        card.style.display = 'block';
-                        setTimeout(() => card.style.opacity = '1', 10);
-                    } else {
-                        card.style.opacity = '0';
-                        setTimeout(() => card.style.display = 'none', 400);
-                    }
-                });
+            cards.forEach(card => {
+                if (filter === 'all' || card.classList.contains(filter)) {
+                    card.style.display = 'block';
+                    setTimeout(() => card.style.opacity = '1', 10);
+                } else {
+                    card.style.opacity = '0';
+                    setTimeout(() => card.style.display = 'none', 400);
+                }
             });
         });
     }
 
+    function openProjectModal(project) {
+        const modal = document.getElementById('projectDetailModal');
+        
+        // Move modal to body to prevent CSS transform containing block issues
+        if (modal && modal.parentElement !== document.body) {
+            document.body.appendChild(modal);
+        }
+        
+        const title = document.getElementById('projectModalTitle');
+        const img = document.getElementById('projectModalImage');
+        const tagsContainer = document.getElementById('projectModalTags');
+        const desc = document.getElementById('projectModalDescription');
+        const linksContainer = document.getElementById('projectModalLinks');
+
+        // Reset & Populate
+        title.textContent = project.title;
+        img.src = project.thumbnail_url || 'https://via.placeholder.com/1200x800?text=' + encodeURIComponent(project.title);
+        desc.textContent = project.long_description || project.short_description || 'No detailed description available.';
+        
+        tagsContainer.innerHTML = (project.tags || []).map(tag => `
+            <span class="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-xs rounded-full font-bold text-gray-500 uppercase">${tag}</span>
+        `).join('');
+
+        linksContainer.innerHTML = `
+            ${project.live_url ? `
+                <a href="${project.live_url}" target="_blank" class="px-6 py-3 bg-primary text-white rounded-xl font-bold flex items-center gap-2 hover:bg-blue-600 transition-all shadow-lg shadow-primary/20">
+                    <i class="fas fa-external-link-alt"></i> Live Demo
+                </a>
+            ` : ''}
+            ${project.github_url ? `
+                <a href="${project.github_url}" target="_blank" class="px-6 py-3 bg-gray-900 dark:bg-dark-bg border border-gray-800 text-white rounded-xl font-bold flex items-center gap-2 hover:bg-black transition-all">
+                    <i class="fab fa-github"></i> Repository
+                </a>
+            ` : ''}
+        `;
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+    }
+
+    const closeProjectDetail = () => {
+        const modal = document.getElementById('projectDetailModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = '';
+    };
+
+    document.getElementById('closeProjectDetailBtn')?.addEventListener('click', closeProjectDetail);
+    document.getElementById('closeProjectDetailModal')?.addEventListener('click', closeProjectDetail);
+
     function openCertModal(cert) {
         const modal = document.getElementById('certModal');
+        
+        // Move modal to body to prevent CSS transform containing block issues
+        if (modal && modal.parentElement !== document.body) {
+            document.body.appendChild(modal);
+        }
+        
         const frame = document.getElementById('certFrame');
         const title = document.getElementById('certModalTitle');
         
