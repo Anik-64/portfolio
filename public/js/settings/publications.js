@@ -8,9 +8,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const cancelDelete = document.getElementById('cancelDelete');
     const confirmDelete = document.getElementById('confirmDelete');
     const dataForm = document.getElementById('dataForm');
-    const modalTitle = document.getElementById('modalTitle');
     const floatingMessage = document.getElementById('floatingMessage');
     const searchInput = document.getElementById('searchInput');
+    const pdfFile = document.getElementById('pdfFile');
+    const pdfUrlInput = document.getElementById('pdf_url');
+    const uploadProgressContainer = document.getElementById('uploadProgressContainer');
+    const uploadProgressBar = document.getElementById('uploadProgressBar');
+    const uploadStatus = document.getElementById('uploadStatus');
 
     let originalData = [];
     let currentId = null;
@@ -26,6 +30,11 @@ document.addEventListener('DOMContentLoaded', function() {
         modalTitle.textContent = 'Add Publication';
         dataForm.reset();
         document.getElementById('is_visible').checked = true;
+        
+        // Reset PDF upload states
+        if (pdfFile) pdfFile.value = '';
+        if (uploadProgressContainer) uploadProgressContainer.classList.add('hidden');
+        
         dataModal.classList.remove('hidden');
     });
 
@@ -46,41 +55,124 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 500));
 
-    dataForm.addEventListener('submit', function(e) {
+    dataForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        const authorsValue = document.getElementById('authors').value.trim();
-        const authorsArray = authorsValue ? authorsValue.split(',').map(s => s.trim()).filter(s => s) : [];
-
-        const linkedinValue = document.getElementById('author_linkedin_urls').value.trim();
-        const linkedinArray = linkedinValue ? linkedinValue.split(',').map(s => s.trim()).filter(s => s) : [];
-
-        const formData = {
-            title: document.getElementById('titleStr').value.trim(),
-            journal_name: document.getElementById('journal_name').value.trim() || null,
-            publisher: document.getElementById('publisher').value.trim() || null,
-            authors: authorsArray,
-            author_linkedin_urls: linkedinArray,
-            abstract: document.getElementById('abstract').value.trim() || null,
-            published_date: document.getElementById('publication_date').value || null,
-            doi: document.getElementById('doi').value.trim() || null,
-            publication_url: document.getElementById('publication_url').value.trim() || null,
-            pdf_url: document.getElementById('pdf_url').value.trim() || null,
-            thumbnail_url: document.getElementById('thumbnail_url').value.trim() || null,
-            is_visible: document.getElementById('is_visible').checked
-        };
-
-        if (!formData.title) {
-            showMessage('Title is required', 'error');
-            return;
+        const saveBtn = dataForm.querySelector('button[type="submit"]');
+        if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Saving...';
         }
 
-        if (currentId) {
-            updateData(currentId, formData);
-        } else {
-            createData(formData);
+        try {
+            // Check for file upload first
+            if (pdfFile && pdfFile.files.length > 0) {
+                const uploadedUrl = await uploadPdfFile(pdfFile.files[0]);
+                if (!uploadedUrl) {
+                    if (saveBtn) {
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = 'Save';
+                    }
+                    return;
+                }
+                if (pdfUrlInput) pdfUrlInput.value = uploadedUrl;
+            }
+
+            const authorsValue = document.getElementById('authors').value.trim();
+            const authorsArray = authorsValue ? authorsValue.split(',').map(s => s.trim()).filter(s => s) : [];
+
+            const linkedinValue = document.getElementById('author_linkedin_urls').value.trim();
+            const linkedinArray = linkedinValue ? linkedinValue.split(',').map(s => s.trim()).filter(s => s) : [];
+
+            const formData = {
+                title: document.getElementById('titleStr').value.trim(),
+                journal_name: document.getElementById('journal_name').value.trim() || null,
+                publisher: document.getElementById('publisher').value.trim() || null,
+                authors: authorsArray,
+                author_linkedin_urls: linkedinArray,
+                abstract: document.getElementById('abstract').value.trim() || null,
+                published_date: document.getElementById('publication_date').value || null,
+                doi: document.getElementById('doi').value.trim() || null,
+                publication_url: document.getElementById('publication_url').value.trim() || null,
+                pdf_url: (pdfUrlInput ? pdfUrlInput.value.trim() : document.getElementById('pdf_url').value.trim()) || null,
+                thumbnail_url: document.getElementById('thumbnail_url').value.trim() || null,
+                is_visible: document.getElementById('is_visible').checked
+            };
+
+            if (!formData.title) {
+                showMessage('Title is required', 'error');
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Save';
+                }
+                return;
+            }
+
+            if (currentId) {
+                await updateData(currentId, formData);
+            } else {
+                await createData(formData);
+            }
+        } catch (err) {
+            console.error(err);
+            showMessage('Error during save', 'error');
+        } finally {
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save';
+            }
         }
     });
+
+    async function uploadPdfFile(file) {
+        if (uploadProgressContainer) uploadProgressContainer.classList.remove('hidden');
+        if (uploadProgressBar) uploadProgressBar.style.width = '0%';
+        if (uploadStatus) uploadStatus.textContent = 'Uploading...';
+
+        const formData = new FormData();
+        formData.append('bookFile', file);
+
+        const accessToken = localStorage.getItem('accessToken');
+        
+        try {
+            const xhr = new XMLHttpRequest();
+            const promise = new Promise((resolve, reject) => {
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable && uploadProgressBar) {
+                        const percent = (e.loaded / e.total) * 100;
+                        uploadProgressBar.style.width = percent + '%';
+                    }
+                });
+
+                xhr.onreadystatechange = () => {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            const response = JSON.parse(xhr.responseText);
+                            resolve(response.data.url);
+                        } else {
+                            reject(new Error('Upload failed'));
+                        }
+                    }
+                };
+            });
+
+            xhr.open('POST', '/api/v1/upload/book/file', true);
+            xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+            xhr.send(formData);
+
+            const url = await promise;
+            if (uploadStatus) uploadStatus.textContent = 'Upload complete!';
+            return url;
+        } catch (err) {
+            console.error('Upload error:', err);
+            showMessage('PDF Upload failed', 'error');
+            return null;
+        } finally {
+            setTimeout(() => {
+                if (uploadProgressContainer) uploadProgressContainer.classList.add('hidden');
+            }, 2000);
+        }
+    }
 
     confirmDelete.addEventListener('click', function() {
         if (currentId) deleteData(currentId);
@@ -327,6 +419,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const itemData = data.data;
         currentId = id;
         modalTitle.textContent = 'Edit Publication';
+        
+        // Reset PDF upload states
+        if (pdfFile) pdfFile.value = '';
+        if (uploadProgressContainer) uploadProgressContainer.classList.add('hidden');
         
         document.getElementById('titleStr').value = itemData.title || '';
         document.getElementById('journal_name').value = itemData.journal_name || '';
