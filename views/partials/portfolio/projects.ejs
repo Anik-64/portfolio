@@ -9,10 +9,7 @@
         
         <!-- Filter Controls -->
         <div id="projectFilters" class="flex flex-wrap items-center justify-center gap-2 p-1 bg-gray-50 dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border">
-            <button data-filter="all" class="filter-btn active">All</button>
-            <button data-filter="devops" class="filter-btn">DevOps</button>
-            <button data-filter="backend" class="filter-btn">Backend</button>
-            <button data-filter="fullstack" class="filter-btn">Full-Stack</button>
+            <!-- Dynamically injected filters -->
         </div>
     </div>
 
@@ -20,6 +17,101 @@
         <!-- Project cards will be injected here -->
         <div class="col-span-full flex items-center justify-center py-40 animate-pulse-slow">
             <span class="text-gray-400 text-lg">Brewing some projects...</span>
+        </div>
+    </div>
+</div>
+
+<!-- Project Detail Modal -->
+<!-- <div id="projectDetailModal" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-2 sm:p-4">
+    
+  
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="closeProjectDetailModal"></div>
+
+    
+    <div class="relative w-full max-w-xl max-h-[80vh] bg-white dark:bg-dark-card rounded-2xl shadow-xl flex flex-col overflow-hidden">
+
+        
+        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-dark-border">
+            <h3 id="projectModalTitle" class="text-lg font-semibold truncate pr-6 dark:text-white">
+                Project Title
+            </h3>
+            <button id="closeProjectDetailBtn" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-400">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        
+        <div class="flex-grow overflow-y-auto">
+            <div id="projectModalContent" class="p-4 space-y-5">
+
+             
+                <div class="aspect-video rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                    <img id="projectModalImage" src="" alt="" class="w-full h-full object-cover">
+                </div>
+
+              
+                <div id="projectModalTags" class="flex flex-wrap gap-2"></div>
+
+             
+                <p id="projectModalDescription"
+                   class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-line">
+                </p>
+
+              
+                <div id="projectModalLinks" class="flex flex-wrap gap-3 pt-2"></div>
+
+            </div>
+        </div>
+    </div>
+</div> -->
+
+
+<!-- Project Detail Modal -->
+<div id="projectDetailModal" class="fixed inset-0 z-[200] hidden items-center justify-center p-4">
+    
+    <!-- Overlay -->
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="closeProjectDetailModal"></div>
+
+    <!-- Modal — landscape: image left, content right -->
+    <div class="relative w-full max-w-4xl max-h-[85vh] bg-white dark:bg-dark-card rounded-2xl shadow-2xl flex flex-row overflow-hidden">
+
+        <!-- LEFT: Image Panel -->
+        <div class="w-2/5 flex-shrink-0 bg-gray-100 dark:bg-gray-900 relative">
+            <img id="projectModalImage" src="" alt=""
+                 class="w-full h-full object-cover absolute inset-0">
+        </div>
+
+        <!-- RIGHT: Content Panel -->
+        <div class="flex-1 flex flex-col min-w-0 max-h-[85vh]">
+
+            <!-- Header -->
+            <div class="flex items-start justify-between px-6 py-4 border-b border-gray-100 dark:border-dark-border flex-shrink-0">
+                <h3 id="projectModalTitle" class="text-lg font-bold dark:text-white leading-snug pr-4">
+                    Project Title
+                </h3>
+                <button id="closeProjectDetailBtn"
+                        class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-400 flex-shrink-0 mt-0.5">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Tags -->
+            <div class="px-6 pt-4 flex-shrink-0">
+                <div id="projectModalTags" class="flex flex-wrap gap-2"></div>
+            </div>
+
+            <!-- Scrollable Description -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar px-6 py-4">
+                <p id="projectModalDescription"
+                   class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-line">
+                </p>
+            </div>
+
+            <!-- Footer: Links -->
+            <div class="px-6 py-4 border-t border-gray-100 dark:border-dark-border flex-shrink-0">
+                <div id="projectModalLinks" class="flex flex-wrap gap-3"></div>
+            </div>
+
         </div>
     </div>
 </div>
