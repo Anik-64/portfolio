@@ -117,10 +117,23 @@
                     </div>
                     <div class="mb-4">
                         <label class="block mb-1 text-gray-700">
-                            PDF URL (Google Cloud Storage)
+                            PDF File (Upload)
+                            <input id="pdfFile" type="file" accept=".pdf" class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </label>
+                        <!-- Progress Bar Container -->
+                        <div id="uploadProgressContainer" class="hidden mt-2">
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div id="uploadProgressBar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <p id="uploadStatus" class="text-xs text-gray-500 mt-1 text-right">Uploading...</p>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block mb-1 text-gray-700">
+                            PDF URL
                             <input id="pdf_url" name="pdf_url"
-                                class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                                type="url" placeholder="https://storage.googleapis.com/...">
+                                class="w-full border rounded px-3 py-2 mt-1 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50" 
+                                type="url" placeholder="https://storage.googleapis.com/..." readonly>
                         </label>
                     </div>
                     <div class="mb-4 col-span-1 md:col-span-2">
