@@ -18,6 +18,11 @@ app.use(
     authenticateToken,
     routers.profilePicRouter
 );
+app.use(
+    '/api/v1/upload/book',
+    authenticateToken,
+    routers.bookUploadRouter
+);
 
 app.use(express.json());
 
@@ -214,7 +219,6 @@ app.get('/profile', authenticateRender, (req, res) => {
 });
 
 // AUTH API Gateways
-app.use('/api/v1/upload/book', authenticateToken, routers.bookUploadRouter);
 app.use('/api/v1/signup', signup);
 app.use('/api/v1/login', login);
 app.use('/api/v1/refresh-token', authenticateToken, refreshToken);
