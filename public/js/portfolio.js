@@ -280,15 +280,26 @@ document.addEventListener('DOMContentLoaded', () => {
         contactDetails.innerHTML = '';
 
         contacts.forEach(c => {
-            // Treat GitHub/LinkedIn special
+            // Treat GitHub/LinkedIn/Docker/Credly special
             const lowerType = c.contacttypetitle.toLowerCase();
-            if (lowerType === 'github' || lowerType === 'linkedin') {
-                const icon = lowerType === 'github' ? 'fab fa-github' : 'fab fa-linkedin';
+            if (['github', 'linkedin', 'docker', 'credly'].includes(lowerType)) {
+                let icon = 'fas fa-link';
+                if (lowerType === 'github') icon = 'fab fa-github';
+                else if (lowerType === 'linkedin') icon = 'fab fa-linkedin';
+                else if (lowerType === 'docker') icon = 'fab fa-docker';
+                else if (lowerType === 'credly') icon = 'fas fa-award';
+                
                 const link = document.createElement('a');
                 link.href = c.contact;
                 link.target = "_blank";
-                link.className = "w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all text-xl";
-                link.innerHTML = `<i class="${icon}"></i>`;
+                link.className = "w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all text-xl tooltip-trigger relative";
+                link.innerHTML = `<i class="${icon}"></i>
+                                  <span class="absolute -top-8 bg-gray-900 text-white text-[10px] py-1 px-2 rounded opacity-0 pointer-events-none transition-opacity whitespace-nowrap">${c.contacttypetitle}</span>`;
+                
+                // Add simple hover tooltip behavior
+                link.addEventListener('mouseenter', () => link.querySelector('span').classList.remove('opacity-0'));
+                link.addEventListener('mouseleave', () => link.querySelector('span').classList.add('opacity-0'));
+                
                 socialLinks.appendChild(link);
             } else if (lowerType === 'email' || lowerType === 'mobile' || lowerType === 'phone') {
                 const icon = lowerType === 'email' ? 'far fa-envelope' : 'fas fa-mobile-alt';
