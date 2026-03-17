@@ -4,6 +4,11 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Prevent default browser scroll jumps for dynamically loaded data
+    if (window.history && 'scrollRestoration' in window.history) {
+        window.history.scrollRestoration = 'manual';
+    }
+
     // 1. Initial State & Data Fetching
     const state = {
         data: null,
@@ -11,6 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
         textIdx: 0,
         isDeleting: false
     };
+
+    // Save scroll position before reload to maintain position
+    window.addEventListener('beforeunload', () => {
+        sessionStorage.setItem('portfolioScrollPosition', window.scrollY);
+    });
 
     bootstrap();
 
@@ -28,6 +38,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 state.data = result.data;
                 populatePortfolio(result.data);
                 initTypingAnimation();
+                
+                // Restore scroll position after DOM rendering
+                const restoreScroll = () => {
+                    const savedScroll = sessionStorage.getItem('portfolioScrollPosition');
+                    if (window.location.hash) {
+                        const target = document.querySelector(window.location.hash);
+                        if (target) {
+                            target.scrollIntoView();
+                        }
+                    } else if (savedScroll) {
+                        window.scrollTo(0, parseInt(savedScroll, 10));
+                    }
+                };
+                
+                // Fire multiple times to account for reflows when images finish loading
+                setTimeout(restoreScroll, 50);
+                setTimeout(restoreScroll, 300);
+                setTimeout(restoreScroll, 800);
             }
         } catch (err) {
             console.error('Failed to load portfolio data:', err);
