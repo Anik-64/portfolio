@@ -66,9 +66,9 @@
     document.addEventListener('DOMContentLoaded', () => {
         const rotatingWord = document.getElementById('rotatingWord');
         const words = [
-            { text: 'Books', class: 'books' },
-            { text: 'Users', class: 'users' },
-            { text: 'Categories', class: 'categories' }
+            { text: 'Certifications', class: 'certifications' },
+            { text: 'Projects', class: 'projects' },
+            { text: 'Education', class: 'education' }
         ];
         let currentIndex = 0;
         let animationInterval;
@@ -76,7 +76,7 @@
 
         function updateWord(index) {
             const wordData = words[index];
-            rotatingWord.classList.remove('books', 'users', 'categories', 'fade-out', 'fade-in');
+            rotatingWord.classList.remove('certifications', 'projects', 'education', 'fade-out', 'fade-in');
             rotatingWord.classList.add(wordData.class);
             rotatingWord.textContent = wordData.text;
         }
