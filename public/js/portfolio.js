@@ -191,7 +191,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <h4 class="font-bold dark:text-white leading-tight mb-1 group-hover:text-primary transition-colors">${cert.title}</h4>
                 <p class="text-xs font-medium text-blue-600 dark:text-blue-400 mb-4">${cert.issuer}</p>
-                <div class="mt-auto text-[10px] text-gray-400 font-mono">${cert.issued_date || ''}</div>
+                <div class="mt-auto flex flex-col gap-3">
+                    <div class="flex justify-between items-center text-[10px] text-gray-400 font-mono">
+                        <span>Issued: ${cert.issued_date ? formatDate(cert.issued_date) : 'N/A'}</span>
+                        ${cert.expiry_date ? `<span>Expires: ${formatDate(cert.expiry_date)}</span>` : ''}
+                    </div>
+                    ${cert.credential_url ? `
+                    <a href="${cert.credential_url}" target="_blank" onclick="event.stopPropagation()" class="text-center w-full px-3 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-primary hover:text-white transition-all text-xs font-bold rounded-lg text-gray-600 dark:text-gray-300">
+                        View Credential <i class="fas fa-external-link-alt ml-1 text-[10px]"></i>
+                    </a>
+                    ` : ''}
+                </div>
             `;
             certGrid.appendChild(card);
         });
