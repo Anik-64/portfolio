@@ -61,7 +61,8 @@ body {
 
 .card-glass:hover {
     @apply border-primary/50 shadow-lg shadow-primary/5;
-    transform: scale(1.01);
+    /* transform: scale(1.01); */
+    box-shadow: 0 8px 30px rgba(59, 130, 246, 0.08), 0 2px 8px rgba(0,0,0,0.06);
 }
 
 /* Animations */
@@ -109,6 +110,18 @@ body {
     @apply bg-gray-300 dark:bg-gray-700;
 }
 
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-200 dark:bg-gray-800 rounded-full;
+}
+
 /* Navbar Scrolled State */
 nav.scrolled {
     @apply bg-white/80 dark:bg-dark-bg/80 border-gray-100 dark:border-dark-border h-16;
@@ -128,4 +141,8 @@ nav.scrolled {
 @keyframes blink {
     from, to { opacity: 1; }
     50% { opacity: 0; }
+}
+
+#projectDetailModal .relative.w-2\/5 {
+    min-height: 300px;
 }
