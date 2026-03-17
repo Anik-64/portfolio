@@ -488,10 +488,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         const frame = document.getElementById('certFrame');
+        const imgContainer = document.getElementById('certImageContainer');
+        const img = document.getElementById('certImage');
+        const noData = document.getElementById('certNoData');
         const title = document.getElementById('certModalTitle');
         
         title.textContent = cert.title + ' — ' + cert.issuer;
-        frame.src = cert.pdf_url || '';
+        
+        // Reset states
+        frame.classList.add('hidden');
+        imgContainer.classList.add('hidden');
+        imgContainer.classList.remove('flex');
+        noData.classList.add('hidden');
+        noData.classList.remove('flex');
+        
+        if (cert.pdf_url) {
+            frame.src = cert.pdf_url;
+            frame.classList.remove('hidden');
+        } else if (cert.badge_image_url) {
+            img.src = cert.badge_image_url;
+            imgContainer.classList.remove('hidden');
+            imgContainer.classList.add('flex');
+            frame.src = '';
+        } else {
+            noData.classList.remove('hidden');
+            noData.classList.add('flex');
+            frame.src = '';
+        }
         
         modal.classList.remove('hidden');
         modal.classList.add('flex');
@@ -503,7 +526,10 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
         document.body.style.overflow = '';
+        
         document.getElementById('certFrame').src = '';
+        const img = document.getElementById('certImage');
+        if (img) img.src = '';
     };
 
     document.getElementById('closeCertBtn')?.addEventListener('click', closeCert);
