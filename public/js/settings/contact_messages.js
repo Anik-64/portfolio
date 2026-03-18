@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
             idCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-black';
             
             const senderCell = row.insertCell(1);
-            senderCell.innerHTML = `<strong>${item.name}</strong><br><span class="text-xs text-blue-500">${item.email}</span>`;
+            senderCell.innerHTML = `<strong>${item.sender_name}</strong><br><span class="text-xs text-blue-500">${item.sender_email}</span>`;
             senderCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-800';
             
             const subjCell = row.insertCell(2);
@@ -192,10 +192,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const statusCell = row.insertCell(4);
             let statusBadge = '';
-            if (item.status === 'new') statusBadge = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">New</span>';
-            else if (item.status === 'read') statusBadge = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Read</span>';
-            else if (item.status === 'replied') statusBadge = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Replied</span>';
-            else statusBadge = `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">${item.status}</span>`;
+            if (item.is_read === true) statusBadge = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Read</span>';
+            else if (item.is_read === false) statusBadge = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Replied</span>';
+            else statusBadge = `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">${item.is_read}</span>`;
 
             statusCell.innerHTML = statusBadge;
             statusCell.className = 'px-4 py-2 whitespace-nowrap text-sm text-gray-600';
@@ -264,18 +263,18 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('subject').classList.add('bg-gray-50');
         document.getElementById('message').classList.add('bg-gray-50');
 
-        document.getElementById('name').value = itemData.name || '';
-        document.getElementById('email').value = itemData.email || '';
+        document.getElementById('name').value = itemData.sender_name || '';
+        document.getElementById('email').value = itemData.sender_email || '';
         document.getElementById('subject').value = itemData.subject || '';
         document.getElementById('message').value = itemData.message || '';
-        document.getElementById('status').value = itemData.status || 'new';
+        document.getElementById('status').value = itemData.is_read || 'new';
 
         dataModal.classList.remove('hidden');
 
         // Automatically mark as read if it was new
-        if (itemData.status === 'new') {
+        if (itemData.is_read === false) {
             document.getElementById('status').value = 'read';
-            updateData(id, { ...itemData, status: 'read' }, true);
+            updateData(id, { ...itemData, is_read: true }, true);
         }
     }
 
