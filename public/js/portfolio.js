@@ -154,34 +154,119 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // --- Experience Timeline ---
+        // const expTimeline = document.getElementById('experienceTimeline');
+        // expTimeline.innerHTML = '';
+
+        // experiences.forEach((exp, idx) => {
+        //     const dateStr = formatDate(exp.start_date) + ' — ' + (exp.end_date ? formatDate(exp.end_date) : 'Present');
+        //     const item = document.createElement('div');
+        //     item.className = 'relative pl-12 md:pl-0';
+        //     item.innerHTML = `
+        //         <div class="md:flex items-start">
+        //             <div class="hidden md:block w-1/2 text-right pr-12 pt-1 font-mono text-sm text-gray-400">
+        //                 ${dateStr}
+        //             </div>
+                    
+        //             <!-- Bullet -->
+        //             <div class="absolute left-0 md:left-1/2 w-4 h-4 rounded-full bg-primary border-4 border-white dark:border-dark-bg -translate-x-1/2 z-10"></div>
+                    
+        //             <div class="md:w-1/2 md:pl-12">
+        //                 <div class="p-6 card-glass">
+        //                     <div class="flex items-center gap-4 mb-4">
+        //                         ${exp.company_logo_url ? `<img src="${exp.company_logo_url}" class="w-10 h-10 rounded-lg object-contain bg-white p-1">` : `<div class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-primary"><i class="fas fa-briefcase"></i></div>`}
+        //                         <div>
+        //                             <h4 class="font-bold dark:text-white leading-tight">${exp.role}</h4>
+        //                             <p class="text-sm text-gray-500">${exp.company} • <span class="md:hidden">${dateStr}</span></p>
+        //                         </div>
+        //                     </div>
+        //                     <div class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-line">${exp.description}</div>
+        //                 </div>
+        //             </div>
+        //         </div>
+        //     `;
+        //     expTimeline.appendChild(item);
+        // });
+        // --- Experience Timeline ---
         const expTimeline = document.getElementById('experienceTimeline');
         expTimeline.innerHTML = '';
 
-        experiences.forEach((exp, idx) => {
-            const dateStr = formatDate(exp.start_date) + ' — ' + (exp.end_date ? formatDate(exp.end_date) : 'Present');
+        experiences.forEach((exp) => {
+            const dateStr = formatDate(exp.start_date) + ' — ' + (exp.is_current || !exp.end_date ? 'Present' : formatDate(exp.end_date));
+            const isCurrent = exp.is_current || !exp.end_date;
+
+            // Parse description into bullet array — supports newline or • separated
+            const bullets = (exp.description || '')
+                .split(/\n|•/)
+                .map(s => s.trim())
+                .filter(Boolean);
+
+            // Build tech tags from exp.tags if available, else skip
+            const tagsHtml = (exp.tags && exp.tags.length)
+                ? `<div class="flex flex-wrap gap-1.5 mt-4 pt-4 border-t border-gray-100 dark:border-dark-border">
+                    ${exp.tags.map(t => `
+                        <span class="text-[10px] font-medium text-gray-500 dark:text-gray-400
+                                        bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700
+                                        px-2 py-1 rounded-md">${t}</span>
+                    `).join('')}
+                </div>`
+                : '';
+
             const item = document.createElement('div');
-            item.className = 'relative pl-12 md:pl-0';
+            item.className = 'relative';
             item.innerHTML = `
-                <div class="md:flex items-start">
-                    <div class="hidden md:block w-1/2 text-right pr-12 pt-1 font-mono text-sm text-gray-400">
-                        ${dateStr}
-                    </div>
-                    
-                    <!-- Bullet -->
-                    <div class="absolute left-0 md:left-1/2 w-4 h-4 rounded-full bg-primary border-4 border-white dark:border-dark-bg -translate-x-1/2 z-10"></div>
-                    
-                    <div class="md:w-1/2 md:pl-12">
-                        <div class="p-6 card-glass">
-                            <div class="flex items-center gap-4 mb-4">
-                                ${exp.company_logo_url ? `<img src="${exp.company_logo_url}" class="w-10 h-10 rounded-lg object-contain bg-white p-1">` : `<div class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-primary"><i class="fas fa-briefcase"></i></div>`}
-                                <div>
-                                    <h4 class="font-bold dark:text-white leading-tight">${exp.role}</h4>
-                                    <p class="text-sm text-gray-500">${exp.company} • <span class="md:hidden">${dateStr}</span></p>
-                                </div>
+                <!-- Timeline dot -->
+                <div class="absolute -left-7 md:-left-9 top-[22px] w-[15px] h-[15px] rounded-full
+                            bg-white dark:bg-dark-bg border-2 flex items-center justify-center
+                            ${isCurrent ? 'border-blue-500' : 'border-gray-300 dark:border-gray-600'}">
+                    <span class="w-[5px] h-[5px] rounded-full
+                                ${isCurrent ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'}"></span>
+                </div>
+
+                <!-- Card -->
+                <div class="bg-white dark:bg-dark-card border border-gray-100 dark:border-dark-border
+                            rounded-2xl p-6 transition-colors
+                            hover:border-gray-200 dark:hover:border-gray-600">
+
+                    <!-- Card header -->
+                    <div class="flex items-start justify-between gap-4 mb-5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-gray-50 dark:bg-gray-800
+                                        border border-gray-100 dark:border-dark-border
+                                        flex items-center justify-center flex-shrink-0 overflow-hidden p-1">
+                                ${exp.company_logo_url
+                                    ? `<img src="${exp.company_logo_url}" class="w-full h-full object-contain">`
+                                    : `<i class="fas fa-briefcase text-gray-400 text-sm"></i>`}
                             </div>
-                            <div class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-line">${exp.description}</div>
+                            <div>
+                                <h4 class="font-bold text-sm dark:text-white leading-snug">${exp.role}</h4>
+                                <p class="text-xs text-gray-400 mt-0.5">${exp.company}${exp.employment_type ? ' · ' + exp.employment_type : ''}</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end gap-1.5 flex-shrink-0">
+                            <span class="text-[10px] font-mono text-gray-400 bg-gray-50 dark:bg-gray-800
+                                        border border-gray-100 dark:border-gray-700 px-2.5 py-1 rounded-full whitespace-nowrap">
+                                ${dateStr}
+                            </span>
+                            ${isCurrent
+                                ? `<span class="text-[10px] font-bold text-green-700 dark:text-green-400
+                                                bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-full">
+                                        Current role
+                                </span>`
+                                : ''}
                         </div>
                     </div>
+
+                    <!-- Bullet points -->
+                    <ul class="space-y-0 divide-y divide-gray-50 dark:divide-dark-border">
+                        ${bullets.map((b, i) => `
+                            <li class="flex gap-3 items-start py-2.5 ${i === 0 ? 'pt-0' : ''}">
+                                <span class="w-1.5 h-1.5 rounded-full bg-blue-400 flex-shrink-0 mt-[5px]"></span>
+                                <span class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">${b}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+
+                    ${tagsHtml}
                 </div>
             `;
             expTimeline.appendChild(item);
