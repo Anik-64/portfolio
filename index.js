@@ -76,7 +76,7 @@ app.use((req, res, next) => {
 });
 
 app.get('/', (req, res) => {
-    res.redirect('/login');
+    res.redirect('/portfolio');
 });
 app.get('/login', (req, res) => {
     res.render('pages/login', {
