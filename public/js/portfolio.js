@@ -69,6 +69,50 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- Hero & About ---
         if (profile) {
             document.getElementById('heroName').textContent = profile.firstname + ' ' + (profile.lastname || '');
+            // --- Hero Terminal ---
+            const termEl = document.getElementById('terminalLines');
+            if (termEl) {
+                // const termLines = [
+                //     { type: 'cmd', text: 'kubectl get nodes' },
+                //     { type: 'ok',  text: '  master    Ready   control-plane   45d' },
+                //     { type: 'out', text: '  worker-1  Ready   node            45d' },
+                //     { type: 'cmd', text: 'docker ps --format "{{.Names}}"' },
+                //     { type: 'out', text: '  smartcare-api' },
+                //     { type: 'out', text: '  nginx-proxy' },
+                //     { type: 'cmd', text: 'jenkins build status' },
+                //     { type: 'ok',  text: '  ✓ prod deploy — passed (2m 14s)' },
+                //     { type: 'cmd', text: 'aws ecs describe-services --cluster prod' },
+                //     { type: 'ok',  text: '  runningCount: 2   desiredCount: 2' },
+                // ];
+                const termLines = [
+                    { type: 'cmd', text: 'docker ps --format "{{.Names}} {{.Status}}"' },
+                    { type: 'out', text: '  smartcare-api     Up 12 days' },
+                    { type: 'out', text: '  agamievent-api    Up 3 days' },
+                    { type: 'out', text: '  nginx-proxy       Up 12 days' },
+                    { type: 'cmd', text: 'aws ecs describe-services --cluster prod --service markdown-svc' },
+                    { type: 'ok',  text: '  runningCount: 2   desiredCount: 2   status: ACTIVE' },
+                    { type: 'cmd', text: 'jenkins build --job markdown-deploy --branch main' },
+                    { type: 'ok',  text: '  ✓ build #47 — passed (2m 14s)  [ECS rolling update complete]' },
+                    { type: 'cmd', text: 'kubectl get nodes' },
+                    { type: 'ok',  text: '  cka-master    Ready   control-plane   12d' },
+                    { type: 'out', text: '  cka-worker-1  Ready   node            12d' },
+                    { type: 'cmd', text: 'gcloud builds list --limit=1' },
+                    { type: 'ok',  text: '  ✓ smartcare-backend  SUCCESS  GCP App Engine  (1m 48s)' },
+                ];
+
+                const colorMap = {
+                    cmd:  'style="color:#85B7EB"',
+                    ok:   'style="color:#1D9E75"',
+                    out:  'style="color:rgba(133,183,235,0.35)"',
+                };
+
+                termEl.innerHTML = termLines.map(l => {
+                    const prefix = l.type === 'cmd'
+                        ? `<span style="color:#1D9E75">→ </span>`
+                        : '';
+                    return `<div ${colorMap[l.type] || ''}>${prefix}${l.text}</div>`;
+                }).join('');
+            }
             document.getElementById('aboutBio').textContent = profile.bio || 'Professional software engineer focusing on cloud and scalable systems.';
             if (profile.profilepicurl) document.getElementById('aboutImage').src = profile.profilepicurl;
             if (profile.resume_url) document.getElementById('downloadResume').href = profile.resume_url;
