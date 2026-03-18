@@ -549,7 +549,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <i class="${cfg.icon}"></i>
                     </div>
                     <div>
-                        <p class="text-[10px] uppercase tracking-[0.1em] font-bold mb-0.5" style="color:#85B7EB; opacity:0.7;">${cfg.label}</p>
+                        <p class="text-[10px] uppercase tracking-[0.1em] font-bold mb-0.5" style="color:#85B7EB; opacity:0.7;">${c.usenote}</p>
                         <p class="text-sm font-medium" style="color:#fff;">${c.contactprefix ? c.contactprefix + ' ' : ''}${c.contact}</p>
                     </div>
                 `;
