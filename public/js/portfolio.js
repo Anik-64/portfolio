@@ -471,7 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="text-[11px] text-gray-400 dark:text-gray-500 font-mono">${edu.start_year} – ${edu.end_year || 'Present'}</span>
                         ${edu.cgpa ? `
                         <span class="text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded-full">
-                            CGPA ${edu.cgpa}
+                            ${edu.id === 1 ? 'CGPA' : 'GPA'} ${edu.cgpa}
                         </span>` : ''}
                     </div>
                 </div>
