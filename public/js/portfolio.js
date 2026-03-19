@@ -429,7 +429,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="flex-grow">
                     <h4 class="text-xl font-bold mb-2 dark:text-white">${pub.title}</h4>
                     <p class="text-sm text-blue-600 font-medium mb-3">${pub.journal_name} • ${pub.publisher}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 italic">Authors: ${(pub.authors || []).join(', ')}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 italic">
+                        Authors: ${(pub.authors || []).map((author, idx) => {
+                            const link = pub.author_linkedin_urls && pub.author_linkedin_urls[idx];
+                            if (link) {
+                                return `<a href="${link}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1">
+                                    ${author} <i class="fab fa-linkedin text-[10px]"></i>
+                                </a>`;
+                            }
+                            return author;
+                        }).join(', ')}
+                    </p>
                     <div class="flex flex-wrap gap-4">
                         ${pub.pdf_url ? `<a href="${pub.pdf_url}" target="_blank" class="text-xs font-bold flex items-center gap-2 border border-gray-100 dark:border-dark-border px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-bg transition-colors uppercase tracking-widest"><i class="fas fa-book-open"></i> Full Text</a>` : ''}
                         ${pub.doi ? `<a href="https://doi.org/${pub.doi}" target="_blank" class="text-xs font-bold text-gray-400 hover:text-primary transition-colors flex items-center gap-2 uppercase tracking-widest">DOI: ${pub.doi}</a>` : ''}
