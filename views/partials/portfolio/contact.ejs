@@ -1,64 +1,3 @@
-<!-- <div class="container mx-auto px-6">
-    <div class="max-w-5xl mx-auto bg-gray-50 dark:bg-dark-card rounded-3xl overflow-hidden border border-gray-100 dark:border-dark-border">
-        <div class="flex flex-col lg:flex-row">
-   
-            <div class="lg:w-5/12 p-8 lg:p-12 bg-primary text-white">
-                <h2 class="text-3xl font-bold mb-6">Let's build something great.</h2>
-                <p class="text-blue-100 mb-10 leading-relaxed">
-                    I'm always open to discussing web development work or partnership opportunities.
-                </p>
-                
-                <div id="contactDetails" class="space-y-6">
-                    
-                </div>
-                
-                
-                <div id="socialLinks" class="flex items-center gap-4 mt-12">
-                    
-                </div>
-            </div>
-            
-            
-            <div class="lg:w-7/12 p-8 lg:p-12">
-                <form id="contactForm" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
-                            <input type="text" name="name" required placeholder="John Doe" class="contact-input">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
-                            <input type="email" name="email" required placeholder="john@example.com" class="contact-input">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Subject</label>
-                        <input type="text" name="subject" placeholder="Project Inquiry" class="contact-input">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Message</label>
-                        <textarea name="message" required rows="4" placeholder="Tell me about your project..." class="contact-input"></textarea>
-                    </div>
-                    
-                    <button type="submit" id="submitContact" class="w-full py-4 bg-primary text-white font-bold rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
-                        <span>Send Message</span>
-                        <i class="fas fa-paper-plane text-xs"></i>
-                    </button>
-                    
-                    <div id="contactStatus" class="hidden text-center text-sm font-medium p-3 rounded-lg mt-4"></div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-    .contact-input {
-        @apply w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-bg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all dark:text-white dark:placeholder-gray-500;
-    }
-</style> -->
-
-
 <div class="container mx-auto px-6">
     <div class="max-w-5xl mx-auto border border-gray-100 dark:border-dark-border rounded-3xl overflow-hidden bg-white dark:bg-dark-card">
         <div class="flex flex-col lg:flex-row">
@@ -131,28 +70,28 @@
                     <div id="contactStatus" class="hidden text-center text-sm font-medium p-4 rounded-xl"></div>
                 </form>
 
-                <!-- Availability indicator -->
-                <!-- <div class="flex items-center justify-center gap-2 mt-6">
+                <div class="flex items-center justify-center gap-2 mt-6">
                     <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                    <span class="text-[11px] text-gray-400">Available for freelance &amp; full-time opportunities</span>
-                </div> -->
+                    <span class="text-[11px] text-gray-400">Available for remote, freelance &amp; full-time opportunities</span>
+                </div>
             </div>
 
         </div>
     </div>
 </div>
 
-<style>
+<style type="text/tailwindcss">
     .contact-input {
         @apply w-full px-4 py-3 rounded-xl text-sm
-               border border-gray-100 dark:border-dark-border
+               border border-gray-200 dark:border-dark-border
                bg-gray-50 dark:bg-dark-bg
-               text-gray-900 dark:text-white
-               placeholder-gray-300 dark:placeholder-gray-600
+               text-gray-900 dark:text-gray-100
+               placeholder-gray-400 dark:placeholder-gray-500
                outline-none transition-all duration-200;
     }
     .contact-input:focus {
-        @apply border-blue-300 dark:border-blue-700 bg-white dark:bg-dark-card;
-        box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
+        @apply border-primary dark:border-primary
+               bg-white dark:bg-black;
+        box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
     }
 </style>
