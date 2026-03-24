@@ -283,6 +283,12 @@ app.use(
 // Public API Gateways (No authentication required)
 app.use('/api/v1/public', routers.portfolioPublicRouter);
 
-app.listen(process.env.PORT || 8080, () => {
-    console.log(`Server running on port ${process.env.PORT || 8080}`);
-});
+// app.listen(process.env.PORT || 8080, () => {
+//     console.log(`Server running on port ${process.env.PORT || 8080}`);
+// });
+
+if (require.main === module) {
+    app.listen(process.env.PORT || 3000, () => console.log(`Running locally on port ${process.env.PORT || 3000}`));
+}
+
+module.exports = app;
