@@ -8,7 +8,7 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [],
-    "author": "AGAMiLabs Ltd.",
+    "author": "Anik Majumder",
     "license": "ISC",
     "dependencies": {
         "@google-cloud/storage": "^7.16.0",
