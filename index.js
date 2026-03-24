@@ -122,7 +122,7 @@ app.get('/settings/skills', authenticateRender, (req, res) => {
         layout: 'layout', 
         title: 'Skills Settings', 
         currentPath: 'settings/skills', 
-        customJS: '/js/settings/skills.js',
+        customJS: '/js/skills.js',
         cache: true,
     });
 });
@@ -131,7 +131,7 @@ app.get('/settings/experiences', authenticateRender, (req, res) => {
         layout: 'layout', 
         title: 'Experiences Settings', 
         currentPath: 'settings/experiences', 
-        customJS: '/js/settings/experiences.js',
+        customJS: '/js/experiences.js',
         cache: true,
     });
 });
@@ -140,7 +140,7 @@ app.get('/settings/projects', authenticateRender, (req, res) => {
         layout: 'layout', 
         title: 'Projects Settings', 
         currentPath: 'settings/projects', 
-        customJS: '/js/settings/projects.js',
+        customJS: '/js/projects.js',
         cache: true,
     });
 });
@@ -149,7 +149,7 @@ app.get('/settings/project-images', authenticateRender, (req, res) => {
         layout: 'layout', 
         title: 'Project Images Settings', 
         currentPath: 'settings/project-images', 
-        customJS: '/js/settings/project_images.js',
+        customJS: '/js/project_images.js',
         cache: true,
     });
 });
@@ -158,7 +158,7 @@ app.get('/settings/certifications', authenticateRender, (req, res) => {
         layout: 'layout', 
         title: 'Certifications Settings', 
         currentPath: 'settings/certifications', 
-        customJS: '/js/settings/certifications.js',
+        customJS: '/js/certifications.js',
         cache: true,
     });
 });
@@ -167,7 +167,7 @@ app.get('/settings/publications', authenticateRender, (req, res) => {
         layout: 'layout', 
         title: 'Publications Settings', 
         currentPath: 'settings/publications', 
-        customJS: '/js/settings/publications.js',
+        customJS: '/js/publications.js',
         cache: true,
     });
 });
@@ -176,7 +176,7 @@ app.get('/settings/education', authenticateRender, (req, res) => {
         layout: 'layout', 
         title: 'Education Settings', 
         currentPath: 'settings/education', 
-        customJS: '/js/settings/education.js',
+        customJS: '/js/education.js',
         cache: true,
     });
 });
@@ -185,7 +185,7 @@ app.get('/settings/trainings', authenticateRender, (req, res) => {
         layout: 'layout', 
         title: 'Trainings Settings', 
         currentPath: 'settings/trainings', 
-        customJS: '/js/settings/trainings.js',
+        customJS: '/js/trainings.js',
         cache: true,
     });
 });
@@ -194,7 +194,7 @@ app.get('/settings/contact-messages', authenticateRender, (req, res) => {
         layout: 'layout', 
         title: 'Contact Messages', 
         currentPath: 'settings/contact-messages', 
-        customJS: '/js/settings/contact_messages.js',
+        customJS: '/js/contact_messages.js',
         cache: true,
     });
 });
@@ -203,7 +203,7 @@ app.get('/settings/audit-log', authenticateRender, (req, res) => {
         layout: 'layout', 
         title: 'Audit Log', 
         currentPath: 'settings/audit-log', 
-        customJS: '/js/settings/audit_log.js',
+        customJS: '/js/audit_log.js',
         cache: true,
     });
 });
