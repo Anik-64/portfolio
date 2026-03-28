@@ -84,18 +84,27 @@ document.addEventListener('DOMContentLoaded', function() {
             const linkedinValue = document.getElementById('author_linkedin_urls').value.trim();
             const linkedinArray = linkedinValue ? linkedinValue.split(',').map(s => s.trim()).filter(s => s) : [];
 
+            const imagesValue = document.getElementById('author_image_urls').value.trim();
+            const imagesArray = imagesValue ? imagesValue.split(',').map(s => s.trim()).filter(s => s) : [];
+
             const formData = {
                 title: document.getElementById('titleStr').value.trim(),
                 journal_name: document.getElementById('journal_name').value.trim() || null,
                 publisher: document.getElementById('publisher').value.trim() || null,
                 authors: authorsArray,
                 author_linkedin_urls: linkedinArray,
+                author_image_urls: imagesArray,
                 abstract: document.getElementById('abstract').value.trim() || null,
                 published_date: document.getElementById('publication_date').value || null,
                 doi: document.getElementById('doi').value.trim() || null,
                 publication_url: document.getElementById('publication_url').value.trim() || null,
                 pdf_url: (pdfUrlInput ? pdfUrlInput.value.trim() : document.getElementById('pdf_url').value.trim()) || null,
                 thumbnail_url: document.getElementById('thumbnail_url').value.trim() || null,
+                date_submitted: document.getElementById('date_submitted').value || null,
+                date_final_revision: document.getElementById('date_final_revision').value || null,
+                date_accepted: document.getElementById('date_accepted').value || null,
+                date_vor_online: document.getElementById('date_vor_online').value || null,
+                date_open_access: document.getElementById('date_open_access').value || null,
                 is_visible: document.getElementById('is_visible').checked
             };
 
@@ -429,12 +438,20 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('publisher').value = itemData.publisher || '';
         document.getElementById('authors').value = (itemData.authors && Array.isArray(itemData.authors)) ? itemData.authors.join(', ') : '';
         document.getElementById('author_linkedin_urls').value = (itemData.author_linkedin_urls && Array.isArray(itemData.author_linkedin_urls)) ? itemData.author_linkedin_urls.join(', ') : '';
+        document.getElementById('author_image_urls').value = (itemData.author_image_urls && Array.isArray(itemData.author_image_urls)) ? itemData.author_image_urls.join(', ') : '';
         document.getElementById('abstract').value = itemData.abstract || '';
         document.getElementById('publication_date').value = itemData.published_date ? new Date(itemData.published_date).toISOString().split('T')[0] : '';
         document.getElementById('doi').value = itemData.doi || '';
         document.getElementById('publication_url').value = itemData.publication_url || '';
         document.getElementById('pdf_url').value = itemData.pdf_url || '';
         document.getElementById('thumbnail_url').value = itemData.thumbnail_url || '';
+        
+        document.getElementById('date_submitted').value = itemData.date_submitted ? new Date(itemData.date_submitted).toISOString().split('T')[0] : '';
+        document.getElementById('date_final_revision').value = itemData.date_final_revision ? new Date(itemData.date_final_revision).toISOString().split('T')[0] : '';
+        document.getElementById('date_accepted').value = itemData.date_accepted ? new Date(itemData.date_accepted).toISOString().split('T')[0] : '';
+        document.getElementById('date_vor_online').value = itemData.date_vor_online ? new Date(itemData.date_vor_online).toISOString().split('T')[0] : '';
+        document.getElementById('date_open_access').value = itemData.date_open_access ? new Date(itemData.date_open_access).toISOString().split('T')[0] : '';
+        
         document.getElementById('is_visible').checked = itemData.is_visible;
 
         dataModal.classList.remove('hidden');

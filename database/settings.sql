@@ -82,9 +82,16 @@ CREATE TABLE publications (
   pdf_url TEXT,                                -- GCS PDF URL
   thumbnail_url TEXT,
   is_visible BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  author_image_urls TEXT[],
+  date_submitted DATE,
+  date_final_revision DATE,
+  date_accepted DATE,
+  date_vor_online DATE,
+  date_open_access DATE
 );
--- ALTER TABLE publications ADD COLUMN author_linkedin_urls TEXT[];
+-- ALTER TABLE publications ADD COLUMN author_image_urls TEXT[];
+-- ALTER TABLE publications ADD COLUMN date_submitted DATE, ADD COLUMN date_final_revision DATE, ADD COLUMN date_accepted DATE, ADD COLUMN date_vor_online DATE, ADD COLUMN date_open_access DATE;
 
 -- EDUCATION (Done)
 CREATE TABLE education (

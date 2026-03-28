@@ -420,31 +420,82 @@ document.addEventListener('DOMContentLoaded', () => {
         
         publications.forEach(pub => {
             const item = document.createElement('div');
-            item.className = 'card-glass p-6 md:p-8 flex flex-col md:flex-row gap-6';
-            item.innerHTML = `
-                <div class="md:w-32 flex-shrink-0 flex md:flex-col items-center gap-4 text-center">
-                    <div class="w-16 h-16 rounded-xl bg-red-50 dark:bg-red-900/10 flex items-center justify-center text-red-500 text-2xl">
-                        <i class="far fa-file-pdf"></i>
+            item.className = 'bg-white dark:bg-dark-card border border-gray-100 dark:border-dark-border rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-primary/5 group';
+            
+            // Build Milestones
+            const milestones = [
+                { label: 'Submitted', date: pub.date_submitted },
+                { label: 'Revisions', date: pub.date_final_revision },
+                { label: 'Accepted', date: pub.date_accepted },
+                { label: 'Online', date: pub.date_vor_online },
+                { label: 'Open Access', date: pub.date_open_access }
+            ].filter(m => m.date);
+
+            const milestonesHtml = milestones.length > 0 
+                ? `<div class="mt-6 pt-6 border-t border-gray-50 dark:border-dark-border">
+                    <h5 class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4">Publication Journey</h5>
+                    <div class="flex flex-wrap gap-y-4">
+                        ${milestones.map((m, i) => `
+                            <div class="flex items-center gap-3 pr-6 last:pr-0 min-w-max">
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] font-bold text-gray-400 uppercase leading-none mb-1">${m.label}</span>
+                                    <span class="text-xs font-mono font-medium text-gray-600 dark:text-gray-300">${formatFullDate(m.date)}</span>
+                                </div>
+                                ${i < milestones.length - 1 ? '<i class="fas fa-chevron-right text-[10px] text-gray-200 dark:text-gray-700 ml-2 hidden sm:block"></i>' : ''}
+                            </div>
+                        `).join('')}
                     </div>
-                    <div class="text-[10px] uppercase font-bold text-gray-400">Published<br>${new Date(pub.published_date).getFullYear()}</div>
-                </div>
-                <div class="flex-grow">
-                    <h4 class="text-xl font-bold mb-2 dark:text-white">${pub.title}</h4>
-                    <p class="text-sm text-blue-600 font-medium mb-3">${pub.journal_name} • ${pub.publisher}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 italic">
-                        Authors: ${(pub.authors || []).map((author, idx) => {
-                            const link = pub.author_linkedin_urls && pub.author_linkedin_urls[idx];
-                            if (link) {
-                                return `<a href="${link}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1">
-                                    ${author} <i class="fab fa-linkedin text-[10px]"></i>
-                                </a>`;
-                            }
-                            return author;
-                        }).join(', ')}
-                    </p>
-                    <div class="flex flex-wrap gap-4">
-                        ${pub.pdf_url ? `<a href="${pub.pdf_url}" target="_blank" class="text-xs font-bold flex items-center gap-2 border border-gray-100 dark:border-dark-border px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-bg transition-colors uppercase tracking-widest"><i class="fas fa-book-open"></i> Full Text</a>` : ''}
-                        ${pub.doi ? `<a href="https://doi.org/${pub.doi}" target="_blank" class="text-xs font-bold text-gray-400 hover:text-primary transition-colors flex items-center gap-2 uppercase tracking-widest">DOI: ${pub.doi}</a>` : ''}
+                   </div>`
+                : '';
+
+            // Build Authors with overlapping avatars
+            const authorsHtml = (pub.authors || []).map((author, idx) => {
+                const img = (pub.author_image_urls && pub.author_image_urls[idx]) || `https://ui-avatars.com/api/?name=${encodeURIComponent(author)}&background=random`;
+                const link = (pub.author_linkedin_urls && pub.author_linkedin_urls[idx]) || '#';
+                
+                return `
+                    <a href="${link}" target="_blank" title="${author}" 
+                       class="relative w-16 h-16 rounded-full border-2 border-white dark:border-dark-card overflow-hidden -ml-2 first:ml-0 transition-transform hover:-translate-y-1 hover:z-50 shadow-sm">
+                        <img src="${img}" class="w-full h-full object-cover" alt="${author}">
+                    </a>
+                `;
+            }).join('');
+
+            item.innerHTML = `
+                <div class="flex flex-col md:flex-row">
+                    <!-- Left: Metadata/Icon -->
+                    <div class="md:w-48 bg-gray-50 dark:bg-gray-800/40 p-8 flex flex-col items-center justify-center text-center border-b md:border-b-0 md:border-r border-gray-100 dark:border-dark-border">
+                        <div class="w-20 h-20 rounded-2xl bg-white dark:bg-dark-card shadow-lg flex items-center justify-center text-red-500 text-3xl mb-4 group-hover:scale-110 transition-transform duration-500">
+                            ${pub.thumbnail_url ? `<img src="${pub.thumbnail_url}" class="w-full h-full object-cover rounded-2xl shadow-inner">` : '<i class="far fa-file-pdf"></i>'}
+                        </div>
+                        <div class="text-[10px] uppercase font-black tracking-tighter text-blue-600 dark:text-blue-400 mb-1">${pub.journal_name || 'Manuscript'}</div>
+                        <div class="text-[10px] uppercase font-bold text-gray-400">${pub.publisher || ''}</div>
+                    </div>
+
+                    <!-- Right: Content -->
+                    <div class="flex-grow p-8">
+                        <div class="flex justify-between items-start mb-4">
+                            <h4 class="text-xl font-bold dark:text-white leading-tight flex-grow pr-4">${pub.title}</h4>
+                            <div class="flex flex-wrap gap-2">
+                                ${pub.pdf_url ? `<a href="${pub.pdf_url}" target="_blank" class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm"><i class="fas fa-file-pdf"></i></a>` : ''}
+                                ${pub.doi ? `<a href="https://doi.org/${pub.doi}" target="_blank" class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-500 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all shadow-sm"><i class="fas fa-link"></i></a>` : ''}
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="flex">
+                                ${authorsHtml}
+                            </div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                ${(pub.authors || []).slice(0, 2).join(', ')}${(pub.authors || []).length > 2 ? ` et al.` : ''}
+                            </div>
+                        </div>
+
+                        <div class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-3 mb-6 font-light">
+                            ${pub.abstract || 'No abstract provided for this research paper.'}
+                        </div>
+
+                        ${milestonesHtml}
                     </div>
                 </div>
             `;
@@ -892,5 +943,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!date) return '';
         const d = new Date(date);
         return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    }
+
+    function formatFullDate(date) {
+        if (!date) return '';
+        const d = new Date(date);
+        return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
     }
 });

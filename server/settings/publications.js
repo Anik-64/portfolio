@@ -80,21 +80,27 @@ publicationsRouter.post('/',
         body('publication_url').optional({ nullable: true, checkFalsy: true }).isURL(),
         body('pdf_url').optional({ nullable: true, checkFalsy: true }).isURL(),
         body('thumbnail_url').optional({ nullable: true, checkFalsy: true }).isURL(),
+        body('author_image_urls').optional({ nullable: true, checkFalsy: true }).isArray(),
+        body('date_submitted').optional({ nullable: true, checkFalsy: true }).isISO8601(),
+        body('date_final_revision').optional({ nullable: true, checkFalsy: true }).isISO8601(),
+        body('date_accepted').optional({ nullable: true, checkFalsy: true }).isISO8601(),
+        body('date_vor_online').optional({ nullable: true, checkFalsy: true }).isISO8601(),
+        body('date_open_access').optional({ nullable: true, checkFalsy: true }).isISO8601(),
         body('is_visible').optional({ nullable: true }).isBoolean().toBoolean()
     ],
     async (req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) return res.status(400).json({ error: true, message: errors.array()[0].msg });
 
-        const { title, journal_name, publisher, authors, author_linkedin_urls, abstract, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible } = req.body;
+        const { title, journal_name, publisher, authors, author_linkedin_urls, author_image_urls, abstract, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible, date_submitted, date_final_revision, date_accepted, date_vor_online, date_open_access } = req.body;
         
         const query = `
-            INSERT INTO publications (title, journal_name, publisher, authors, author_linkedin_urls, abstract, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, COALESCE($12, true))
+            INSERT INTO publications (title, journal_name, publisher, authors, author_linkedin_urls, author_image_urls, abstract, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible, date_submitted, date_final_revision, date_accepted, date_vor_online, date_open_access)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, COALESCE($13, true), $14, $15, $16, $17, $18)
             RETURNING *
         `;
         try {
-            const result = await pool.query(query, [title, journal_name, publisher, authors, author_linkedin_urls, abstract?xss(abstract):null, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible]);
+            const result = await pool.query(query, [title, journal_name, publisher, authors, author_linkedin_urls, author_image_urls, abstract?xss(abstract):null, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible, date_submitted, date_final_revision, date_accepted, date_vor_online, date_open_access]);
             const newRecord = result.rows[0];
             
             await logAudit(req.user.userno, 'CREATE', 'publications', newRecord.id, { title });
@@ -128,22 +134,28 @@ publicationsRouter.put('/:id',
         body('publication_url').optional({ nullable: true, checkFalsy: true }).isURL(),
         body('pdf_url').optional({ nullable: true, checkFalsy: true }).isURL(),
         body('thumbnail_url').optional({ nullable: true, checkFalsy: true }).isURL(),
+        body('author_image_urls').optional({ nullable: true, checkFalsy: true }).isArray(),
+        body('date_submitted').optional({ nullable: true, checkFalsy: true }).isISO8601(),
+        body('date_final_revision').optional({ nullable: true, checkFalsy: true }).isISO8601(),
+        body('date_accepted').optional({ nullable: true, checkFalsy: true }).isISO8601(),
+        body('date_vor_online').optional({ nullable: true, checkFalsy: true }).isISO8601(),
+        body('date_open_access').optional({ nullable: true, checkFalsy: true }).isISO8601(),
         body('is_visible').optional({ nullable: true }).isBoolean().toBoolean()
     ],
     async (req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) return res.status(400).json({ error: true, message: errors.array()[0].msg });
 
-        const { title, journal_name, publisher, authors, author_linkedin_urls, abstract, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible } = req.body;
+        const { title, journal_name, publisher, authors, author_linkedin_urls, author_image_urls, abstract, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible, date_submitted, date_final_revision, date_accepted, date_vor_online, date_open_access } = req.body;
         
         const query = `
             UPDATE publications 
-            SET title=$2, journal_name=$3, publisher=$4, authors=$5, author_linkedin_urls=$6, abstract=$7, published_date=$8, doi=$9, publication_url=$10, pdf_url=$11, thumbnail_url=$12, is_visible=COALESCE($13, is_visible)
+            SET title=$2, journal_name=$3, publisher=$4, authors=$5, author_linkedin_urls=$6, author_image_urls=$7, abstract=$8, published_date=$9, doi=$10, publication_url=$11, pdf_url=$12, thumbnail_url=$13, is_visible=COALESCE($14, is_visible), date_submitted=$15, date_final_revision=$16, date_accepted=$17, date_vor_online=$18, date_open_access=$19
             WHERE id = $1
             RETURNING *
         `;
         try {
-            const result = await pool.query(query, [req.params.id, title, journal_name, publisher, authors, author_linkedin_urls, abstract?xss(abstract):null, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible]);
+            const result = await pool.query(query, [req.params.id, title, journal_name, publisher, authors, author_linkedin_urls, author_image_urls, abstract?xss(abstract):null, published_date, doi, publication_url, pdf_url, thumbnail_url, is_visible, date_submitted, date_final_revision, date_accepted, date_vor_online, date_open_access]);
             if (result.rowCount === 0) return res.status(404).json({ error: true, message: 'Publication not found!' });
             
             await logAudit(req.user.userno, 'UPDATE', 'publications', req.params.id, { title });
