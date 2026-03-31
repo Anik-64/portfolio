@@ -431,22 +431,56 @@ document.addEventListener('DOMContentLoaded', () => {
                 { label: 'Open Access', date: pub.date_open_access }
             ].filter(m => m.date);
 
-            const milestonesHtml = milestones.length > 0 
-                ? `<div class="mt-6 pt-6 border-t border-gray-50 dark:border-dark-border">
-                    <h5 class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4">Publication Journey</h5>
-                    <div class="flex flex-wrap gap-y-4">
-                        ${milestones.map((m, i) => `
-                            <div class="flex items-center gap-3 pr-6 last:pr-0 min-w-max">
-                                <div class="flex flex-col">
-                                    <span class="text-[10px] font-bold text-gray-400 uppercase leading-none mb-1">${m.label}</span>
-                                    <span class="text-xs font-mono font-medium text-gray-600 dark:text-gray-300">${formatFullDate(m.date)}</span>
-                                </div>
-                                ${i < milestones.length - 1 ? '<i class="fas fa-chevron-right text-[10px] text-gray-200 dark:text-gray-700 ml-2 hidden sm:block"></i>' : ''}
+            const milestonesHtml = milestones.length > 0
+            ? `<div class="mt-6 pt-6 border-t border-gray-50 dark:border-dark-border">
+                <h5 class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-5">Publication journey</h5>
+
+                <!-- Desktop: horizontal stepper (hidden on mobile) -->
+                <div class="hidden sm:grid gap-0"
+                    style="grid-template-columns: repeat(${milestones.length}, 1fr);">
+                    ${milestones.map((m, i) => `
+                        <div class="flex flex-col items-center relative">
+                            ${i < milestones.length - 1
+                                ? `<div class="absolute top-[13px] left-1/2 w-full h-px bg-blue-200 dark:bg-blue-900/40 z-0"></div>`
+                                : ''}
+                            <div class="w-7 h-7 rounded-full border-2 border-blue-400 dark:border-blue-600
+                                        bg-blue-50 dark:bg-blue-900/20
+                                        flex items-center justify-center relative z-10
+                                        text-blue-500 dark:text-blue-400 text-[9px] font-bold">
+                                ✓
                             </div>
-                        `).join('')}
-                    </div>
-                   </div>`
-                : '';
+                            <span class="text-[9px] font-bold uppercase tracking-[0.08em] text-gray-400 mt-2 text-center leading-tight">
+                                ${m.label}
+                            </span>
+                            <span class="text-[9px] font-mono text-blue-500 dark:text-blue-400 mt-0.5 text-center">
+                                ${formatFullDate(m.date)}
+                            </span>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <!-- Mobile: vertical timeline (hidden on desktop) -->
+                <div class="flex flex-col sm:hidden">
+                    ${milestones.map((m, i) => `
+                        <div class="flex gap-3 items-start relative pb-4 last:pb-0">
+                            ${i < milestones.length - 1
+                                ? `<div class="absolute left-[9px] top-5 bottom-0 w-px bg-blue-200 dark:bg-blue-900/40"></div>`
+                                : ''}
+                            <div class="w-[18px] h-[18px] rounded-full border-2 border-blue-400 dark:border-blue-600
+                                        bg-blue-50 dark:bg-blue-900/20
+                                        flex items-center justify-center flex-shrink-0 relative z-10
+                                        text-blue-500 text-[8px] font-bold mt-0.5">
+                                ✓
+                            </div>
+                            <div>
+                                <div class="text-xs font-bold text-gray-700 dark:text-gray-200 leading-tight">${m.label}</div>
+                                <div class="text-[10px] font-mono text-blue-500 dark:text-blue-400 mt-0.5">${formatFullDate(m.date)}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>`
+            : '';
 
             // Build Authors with overlapping avatars
             const authorsHtml = (pub.authors || []).map((author, idx) => {
