@@ -41,10 +41,79 @@
             }
         }
     </script>
+
+    <style>
+        @keyframes loaderFadeUp {
+            from { opacity: 0; transform: translateY(4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes loaderBlink {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0; }
+        }
+        #pageLoader.fade-out {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+    </style>
     
     <link rel="stylesheet" href="/css/portfolio.css">
 </head>
 <body class="bg-white dark:bg-dark-bg text-gray-900 dark:text-gray-100 transition-colors duration-300">
+
+    <!-- ── Page Loader ── -->
+    <div id="pageLoader" class="fixed inset-0 z-[999] flex items-center justify-center flex-col gap-8"
+         style="background:#0A0A0A;">
+        
+        <!-- Orbiting rings -->
+        <div class="relative w-[72px] h-[72px]">
+            <div class="absolute inset-0 rounded-full animate-spin"
+                 style="border:1.5px solid transparent; border-top-color:#1D9E75; animation-duration:1.2s;"></div>
+            <div class="absolute rounded-full"
+                 style="inset:10px; border:1.5px solid transparent; border-top-color:#378ADD;
+                        animation: spin 1.8s linear infinite reverse;">
+            </div>
+            <div class="absolute inset-0 flex items-center justify-center text-xl"
+                 style="color:#85B7EB;">⚙</div>
+        </div>
+
+        <!-- Terminal lines -->
+        <div class="flex flex-col gap-1.5 font-mono text-[11px]" style="width:280px;">
+            <div class="loader-line opacity-0" style="animation: loaderFadeUp 0.4s 0.1s forwards;">
+                <span style="color:#1D9E75;">→ </span>
+                <span style="color:#85B7EB;">initializing portfolio...</span>
+            </div>
+            <div class="loader-line opacity-0" style="animation: loaderFadeUp 0.4s 0.5s forwards;">
+                <span style="color:#1D9E75;">→ ✓ </span>
+                <span style="color:#1D9E75;">connecting to services</span>
+            </div>
+            <div class="loader-line opacity-0" style="animation: loaderFadeUp 0.4s 0.9s forwards;">
+                <span style="color:#1D9E75;">→ ✓ </span>
+                <span style="color:#1D9E75;">loading credentials</span>
+            </div>
+            <div class="loader-line opacity-0 flex items-center gap-1" style="animation: loaderFadeUp 0.4s 1.3s forwards;">
+                <span style="color:rgba(133,183,235,0.3);">  mounting components</span>
+                <span class="inline-block w-[7px] h-[13px] align-middle"
+                      style="background:#1D9E75; animation: loaderBlink 0.8s step-end infinite;"></span>
+            </div>
+        </div>
+
+        <!-- Progress bar -->
+        <div style="width:280px;">
+            <div class="flex justify-between font-mono mb-1.5"
+                 style="font-size:9px; color:rgba(133,183,235,0.35); letter-spacing:0.1em; text-transform:uppercase;">
+                <span>build pipeline</span>
+                <span id="loaderPercent">0%</span>
+            </div>
+            <div class="rounded-full overflow-hidden" style="height:2px; background:rgba(133,183,235,0.08);">
+                <div id="loaderBar" class="h-full rounded-full"
+                     style="width:0%; background:linear-gradient(90deg,#1D9E75,#378ADD); transition: width 0.3s ease;"></div>
+            </div>
+        </div>
+
+    </div>
+
     <!-- Grid Dot Background -->
     <div class="fixed inset-0 z-[-1] pointer-events-none opacity-[0.03] dark:opacity-[0.07]" style="background-image: radial-gradient(#3B82F6 1px, transparent 1px); background-size: 32px 32px;"></div>
 

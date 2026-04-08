@@ -1,10 +1,5 @@
-/**
- * Portfolio Main Logic
- * Single Page Experience, Animations, and Data Orchestration
- */
-
 document.addEventListener('DOMContentLoaded', () => {
-    // Prevent default browser scroll jumps for dynamically loaded data
+
     if (window.history && 'scrollRestoration' in window.history) {
         window.history.scrollRestoration = 'manual';
     }
@@ -24,41 +19,73 @@ document.addEventListener('DOMContentLoaded', () => {
 
     bootstrap();
 
-    // 2. Core Functions
+    // 2. Core Function
     async function bootstrap() {
         initTheme();
         initMobileMenu();
         initScrollEffects();
         
-        // Fetch all data
+        let progress = 0;
+        const loaderBar = document.getElementById('loaderBar');
+        const loaderPercent = document.getElementById('loaderPercent');
+
+        const tickProgress = (target, duration) => {
+            return new Promise(resolve => {
+                const start = progress;
+                const steps = 30;
+                const increment = (target - start) / steps;
+                let step = 0;
+                const interval = setInterval(() => {
+                    step++;
+                    progress = Math.round(start + increment * step);
+                    if (loaderBar) loaderBar.style.width = progress + '%';
+                    if (loaderPercent) loaderPercent.textContent = progress + '%';
+                    if (step >= steps) { clearInterval(interval); resolve(); }
+                }, duration / steps);
+            });
+        };
+
+        const hideLoader = () => {
+            const loader = document.getElementById('pageLoader');
+            if (!loader) return;
+            loader.classList.add('fade-out');
+            setTimeout(() => loader.remove(), 500);
+        };
+
+        tickProgress(40, 600);
+
         try {
             const response = await fetch('/api/v1/public/data');
             const result = await response.json();
+
+            await tickProgress(80, 400);
+
             if (!result.error) {
                 state.data = result.data;
                 populatePortfolio(result.data);
                 initTypingAnimation();
-                
-                // Restore scroll position after DOM rendering
+
+                await tickProgress(100, 300);
+                setTimeout(hideLoader, 200);
+
                 const restoreScroll = () => {
                     const savedScroll = sessionStorage.getItem('portfolioScrollPosition');
                     if (window.location.hash) {
                         const target = document.querySelector(window.location.hash);
-                        if (target) {
-                            target.scrollIntoView();
-                        }
+                        if (target) target.scrollIntoView();
                     } else if (savedScroll) {
                         window.scrollTo(0, parseInt(savedScroll, 10));
                     }
                 };
-                
-                // Fire multiple times to account for reflows when images finish loading
                 setTimeout(restoreScroll, 50);
                 setTimeout(restoreScroll, 300);
                 setTimeout(restoreScroll, 800);
+            } else {
+                hideLoader();
             }
         } catch (err) {
             console.error('Failed to load portfolio data:', err);
+            hideLoader();
         }
     }
 
@@ -72,18 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // --- Hero Terminal ---
             const termEl = document.getElementById('terminalLines');
             if (termEl) {
-                // const termLines = [
-                //     { type: 'cmd', text: 'kubectl get nodes' },
-                //     { type: 'ok',  text: '  master    Ready   control-plane   45d' },
-                //     { type: 'out', text: '  worker-1  Ready   node            45d' },
-                //     { type: 'cmd', text: 'docker ps --format "{{.Names}}"' },
-                //     { type: 'out', text: '  smartcare-api' },
-                //     { type: 'out', text: '  nginx-proxy' },
-                //     { type: 'cmd', text: 'jenkins build status' },
-                //     { type: 'ok',  text: '  ✓ prod deploy — passed (2m 14s)' },
-                //     { type: 'cmd', text: 'aws ecs describe-services --cluster prod' },
-                //     { type: 'ok',  text: '  runningCount: 2   desiredCount: 2' },
-                // ];
                 const termLines = [
                     { type: 'cmd', text: 'docker ps --format "{{.Names}} {{.Status}}"' },
                     { type: 'out', text: '  smartcare-api     Up 12 days' },
@@ -197,39 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
             skillsContainer.appendChild(card);
         });
 
-        // --- Experience Timeline ---
-        // const expTimeline = document.getElementById('experienceTimeline');
-        // expTimeline.innerHTML = '';
-
-        // experiences.forEach((exp, idx) => {
-        //     const dateStr = formatDate(exp.start_date) + ' — ' + (exp.end_date ? formatDate(exp.end_date) : 'Present');
-        //     const item = document.createElement('div');
-        //     item.className = 'relative pl-12 md:pl-0';
-        //     item.innerHTML = `
-        //         <div class="md:flex items-start">
-        //             <div class="hidden md:block w-1/2 text-right pr-12 pt-1 font-mono text-sm text-gray-400">
-        //                 ${dateStr}
-        //             </div>
-                    
-        //             <!-- Bullet -->
-        //             <div class="absolute left-0 md:left-1/2 w-4 h-4 rounded-full bg-primary border-4 border-white dark:border-dark-bg -translate-x-1/2 z-10"></div>
-                    
-        //             <div class="md:w-1/2 md:pl-12">
-        //                 <div class="p-6 card-glass">
-        //                     <div class="flex items-center gap-4 mb-4">
-        //                         ${exp.company_logo_url ? `<img src="${exp.company_logo_url}" class="w-10 h-10 rounded-lg object-contain bg-white p-1">` : `<div class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-primary"><i class="fas fa-briefcase"></i></div>`}
-        //                         <div>
-        //                             <h4 class="font-bold dark:text-white leading-tight">${exp.role}</h4>
-        //                             <p class="text-sm text-gray-500">${exp.company} • <span class="md:hidden">${dateStr}</span></p>
-        //                         </div>
-        //                     </div>
-        //                     <div class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-line">${exp.description}</div>
-        //                 </div>
-        //             </div>
-        //         </div>
-        //     `;
-        //     expTimeline.appendChild(item);
-        // });
         // --- Experience Timeline ---
         const expTimeline = document.getElementById('experienceTimeline');
         expTimeline.innerHTML = '';
