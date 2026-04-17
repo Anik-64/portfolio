@@ -14,8 +14,10 @@ CREATE TABLE gen_peopleprimary (
     lastname VARCHAR(127) DEFAULT NULL,
     tagline TEXT[], -- e.g. ["Software Engineer", "DevOps Engineer"]
     bio TEXT,
+    bio_backend TEXT,
     profilepicurl VARCHAR(511) DEFAULT NULL,
     resume_url TEXT,
+    resume_url_backend TEXT,
     years_of_experience INT,
     validated BOOLEAN NOT NULL DEFAULT true,
     createdatetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -36,7 +38,6 @@ CREATE TABLE gen_peoplecontact(
     CONSTRAINT fk_peoplecontact_peopleno FOREIGN KEY (peopleno) REFERENCES gen_peopleprimary (peopleno) ON UPDATE CASCADE,
     CONSTRAINT fk_peoplecontact_contacttypeno FOREIGN KEY (contacttypeno) REFERENCES gen_contacttype (contacttypeno) ON UPDATE CASCADE
 );
--- ALTER TABLE gen_peoplecontact ADD COLUMN isverified SMALLINT DEFAULT 0;
 
 -- gen_users (userno, peopleno, username, passphrase, authkey, userstatusno, ucreatedatetime, reset_pass_count, updatetime)
 CREATE TABLE gen_users (

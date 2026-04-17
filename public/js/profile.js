@@ -65,7 +65,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 lastname: document.getElementById('lastName').value.trim() || null,
                 tagline: taglineArray,
                 bio: document.getElementById('bio').value.trim() || null,
+                bio_backend: document.getElementById('bioBackend').value.trim() || null,
                 resume_url: document.getElementById('resumeUrl').value.trim() || null,
+                resume_url_backend: document.getElementById('resumeUrlBackend').value.trim() || null,
                 years_of_experience: parseInt(document.getElementById('experience').value) || 0,
                 profilepicurl: data.profilepicurl
             };
@@ -89,7 +91,9 @@ document.addEventListener('DOMContentLoaded', function() {
             lastname: document.getElementById('lastName').value.trim() || null,
             tagline: taglineArray,
             bio: document.getElementById('bio').value.trim() || null,
+            bio_backend: document.getElementById('bioBackend').value.trim() || null,
             resume_url: document.getElementById('resumeUrl').value.trim() || null,
+            resume_url_backend: document.getElementById('resumeUrlBackend').value.trim() || null,
             years_of_experience: parseInt(document.getElementById('experience').value) || 0,
             profilepicurl: profilePic.src.startsWith('data:') ? null : profilePic.src // If it's a base64 from a previous failed load or placeholder, handle it
         };
@@ -194,7 +198,9 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('lastName').value = profile.lastname || '';
         document.getElementById('tagline').value = profile.tagline ? profile.tagline.join(', ') : '';
         document.getElementById('bio').value = profile.bio || '';
+        document.getElementById('bioBackend').value = profile.bio_backend || '';
         document.getElementById('resumeUrl').value = profile.resume_url || '';
+        document.getElementById('resumeUrlBackend').value = profile.resume_url_backend || '';
         document.getElementById('experience').value = profile.years_of_experience || 0;
     }
 

@@ -35,8 +35,10 @@ profileRouter.put('/',
         body('lastname').optional({ nullable: true }).isString().trim().escape().isLength({ max: 127 }),
         body('tagline').optional({ nullable: true }).isArray(),
         body('bio').optional({ nullable: true }).isString().trim(),
+        body('bio_backend').optional({ nullable: true }).isString().trim(),
         body('profilepicurl').optional({ nullable: true }).isString().trim().isLength({ max: 511 }),
         body('resume_url').optional({ nullable: true }).isString().trim(),
+        body('resume_url_backend').optional({ nullable: true }).isString().trim(),
         body('years_of_experience').optional({ nullable: true }).isInt().toInt()
     ],
     async (req, res) => {
@@ -46,16 +48,16 @@ profileRouter.put('/',
         const peopleno = req.user.peopleno;
         if (!peopleno) return res.status(400).json({ error: true, message: 'User profile not found' });
 
-        const { firstname, lastname, tagline, bio, profilepicurl, resume_url, years_of_experience } = req.body;
+        const { firstname, lastname, tagline, bio, bio_backend, profilepicurl, resume_url, resume_url_backend, years_of_experience } = req.body;
         
         const query = `
             UPDATE gen_peopleprimary 
-            SET firstname = $2, lastname = $3, tagline = $4, bio = $5, profilepicurl = $6, resume_url = $7, years_of_experience = $8
+            SET firstname = $2, lastname = $3, tagline = $4, bio = $5, bio_backend = $6, profilepicurl = $7, resume_url = $8, resume_url_backend = $9, years_of_experience = $10
             WHERE peopleno = $1
             RETURNING *
         `;
         try {
-            const result = await pool.query(query, [peopleno, firstname, lastname, tagline, bio, profilepicurl, resume_url, years_of_experience]);
+            const result = await pool.query(query, [peopleno, firstname, lastname, tagline, bio, bio_backend, profilepicurl, resume_url, resume_url_backend, years_of_experience]);
             await logAudit(req.user.userno, 'UPDATE', 'gen_peopleprimary', peopleno, { firstname, lastname });
             
             res.status(200).json({ error: false, message: 'Profile updated successfully', data: result.rows[0] });

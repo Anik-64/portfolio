@@ -39,10 +39,11 @@ const decodeData = (data) => {
 
 // Helper to fetch all data for the public portfolio
 portfolioPublicRouter.get('/data', async (req, res) => {
+    const { persona } = req.query;
     try {
         // Fetch everything in parallel
         const [
-            profile,
+            profileResult,
             contacts,
             skills,
             experiences,
@@ -84,8 +85,16 @@ portfolioPublicRouter.get('/data', async (req, res) => {
             };
         });
 
+        const profileRow = profileResult.rows[0] || null;
+
+        // Tweak content based on persona
+        if (persona === 'backend' && profileRow) {
+            if (profileRow.bio_backend) profileRow.bio = profileRow.bio_backend;
+            if (profileRow.resume_url_backend) profileRow.resume_url = profileRow.resume_url_backend;
+        }
+
         const rawData = {
-            profile: profile.rows[0] || null,
+            profile: profileRow,
             contacts: contacts.rows,
             skills: groupedSkills,
             experiences: experiences.rows,

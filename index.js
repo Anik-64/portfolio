@@ -112,7 +112,16 @@ app.get('/unauthorized', (req, res) => {
 app.get('/portfolio', async (req, res) => {
     res.render('pages/portfolio', {
         layout: false, 
-        title: 'Portfolio | Software Engineer'
+        title: 'Portfolio | DevOps Engineer',
+        persona: 'devops'
+    });
+});
+
+app.get('/backend', async (req, res) => {
+    res.render('pages/portfolio', {
+        layout: false, 
+        title: 'Portfolio | Software Engineer',
+        persona: 'backend'
     });
 });
 

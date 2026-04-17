@@ -55,7 +55,8 @@ document.addEventListener('DOMContentLoaded', () => {
         tickProgress(40, 600);
 
         try {
-            const response = await fetch('/api/v1/public/data');
+            const persona = window.PORTFOLIO_STATE?.persona || 'devops';
+            const response = await fetch(`/api/v1/public/data?persona=${persona}`);
             const result = await response.json();
 
             await tickProgress(80, 400);
@@ -99,7 +100,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // --- Hero Terminal ---
             const termEl = document.getElementById('terminalLines');
             if (termEl) {
-                const termLines = [
+                const persona = window.PORTFOLIO_STATE?.persona || 'devops';
+                
+                const devopsLines = [
                     { type: 'cmd', text: 'docker ps --format "{{.Names}} {{.Status}}"' },
                     { type: 'out', text: '  smartcare-api     Up 12 days' },
                     { type: 'out', text: '  agamievent-api    Up 3 days' },
@@ -114,6 +117,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     { type: 'cmd', text: 'gcloud builds list --limit=1' },
                     { type: 'ok',  text: '  ✓ smartcare-backend  SUCCESS  GCP App Engine  (1m 48s)' },
                 ];
+
+                const backendLines = [
+                    { type: 'cmd', text: 'npm run dev' },
+                    { type: 'ok',  text: '  > portfolio@1.0.0 dev' },
+                    { type: 'ok',  text: '  > nodemon index.js' },
+                    { type: 'out', text: '  [nodemon] starting `node index.js`' },
+                    { type: 'out', text: '  Connected to: PostgreSQL 15.3 on x86_64' },
+                    { type: 'ok',  text: '  Running locally on port 3000' },
+                    { type: 'cmd', text: 'curl -X GET http://localhost:3000/api/v1/healthcheck' },
+                    { type: 'ok',  text: '  {"status": "Ok"}' },
+                    { type: 'cmd', text: 'go test ./internal/auth/...' },
+                    { type: 'ok',  text: '  ok      portfolio/internal/auth     0.234s' },
+                    { type: 'cmd', text: 'redis-cli ping' },
+                    { type: 'ok',  text: '  PONG' },
+                ];
+
+                const termLines = persona === 'backend' ? backendLines : devopsLines;
 
                 const colorMap = {
                     cmd:  'style="color:#85B7EB"',
